@@ -12,3 +12,4 @@ qa/
 visual/
 *.json
 data/
+.env
