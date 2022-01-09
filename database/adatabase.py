@@ -15,8 +15,11 @@ class ADatabase(IDatabase):
         super().__init__()
     
     def connect(self):
-        self.client = MongoClient(f"mongodb+srv://chungejy:{token}@scene.zblsh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",tlsCAFile=ca)
+        self.client = MongoClient("localhost",port=27017)
     
+    def cloud_connect(self):
+        self.client = MongoClient(f"mongodb+srv://chungejy:{token}@scene.zblsh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",tlsCAFile=ca)
+
     def disconnect(self):
         self.client.close()
 
