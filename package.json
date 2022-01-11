@@ -1,14 +1,13 @@
 {
-  "name": "comet_venv",
+  "name": "comet",
   "version": "1.0.0",
-  "description": "",
   "main": "webpack.config.js",
   "directories": {
     "lib": "lib"
   },
   "scripts": {
-    "dev": "webpack --mode development --watch ./frontend/src/index.js --output-path ./frontend/static/frontend/",
-    "build": "webpack --mode production ./frontend/src/index.js --output-path ./frontend/static/frontend/"
+    "dev": "webpack --mode development --watch ./comet/frontend/src/index.js --output-path ./comet/frontend/static/frontend/",
+    "build": "webpack --mode production ./comet/frontend/src/index.js --output-path ./comet/frontend/static/frontend/"
   },
   "keywords": [],
   "author": "",
@@ -25,5 +24,14 @@
     "react-dom": "^17.0.2",
     "webpack": "^5.65.0",
     "webpack-cli": "^4.9.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chung-ejy/comet.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chung-ejy/comet/issues"
+  },
+  "homepage": "https://github.com/chung-ejy/comet#readme",
+  "description": ""
 }

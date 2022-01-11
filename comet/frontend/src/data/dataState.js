@@ -6,7 +6,7 @@ import axios from "axios"
 
 const DataState = props => {
     const initialState = {
-        title: "Comet",
+        title: "Data",
         data: {},
         error:null,
         loading:false

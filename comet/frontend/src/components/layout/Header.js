@@ -5,7 +5,7 @@ export class Header extends Component {
         return (
             <nav class="navbar navbar-expand-lg item-center navbar-dark bg-primary">
                 <div class="container-fluid">
-                    <a class="navbar-brand mx-auto" href="#">Framework</a>
+                    <a class="navbar-brand mx-auto" href="#">Comet</a>
                 </div>
             </nav>
         )
