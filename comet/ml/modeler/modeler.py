@@ -37,8 +37,8 @@ class Modeler(object):
     @classmethod
     def regression(self,data):
         results = []
-        sk_result = self.sk_regression(data)
-        results.extend(sk_result)
+        # sk_result = self.sk_regression(data)
+        # results.extend(sk_result)
         xgb_result = self.xgb_regression(data)
         results.append(xgb_result)
         # results.append(self.light_regression(data))
