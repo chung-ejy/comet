@@ -23,24 +23,24 @@ whitelist_symbols = [
                     ,'MATIC'
                     ]
 live = True
-sleep_time = 600
-minimum_funds = 10
-comet.cloud_connect()
-backtest_results = comet.retrieve("trading_params")
-trading_params = backtest_results.sort_values("pv",ascending=False).iloc[0]
-retrack_days = int(trading_params["retrack_days"])
-req = trading_params["req"]
-signal = trading_params["signal"]
-value = trading_params["value"]
-conservative = trading_params["conservative"]
-entry_strategy = trading_params["entry_strategy"]
-exit_strategy = trading_params["exit_strategy"]
-fee = 0.005
-minimum_rows = int(retrack_days * 3)
 status = "initial_load"
+comet.cloud_connect()
 # print(retrack_days,req,signal,value,conservative,entry_strategy,exit_strategy)
 while live:
     try:
+        sleep_time = 3600
+        minimum_funds = 50
+        backtest_results = comet.retrieve("trading_params")
+        trading_params = backtest_results.sort_values("pv",ascending=False).iloc[0]
+        retrack_days = int(trading_params["retrack_days"])
+        req = trading_params["req"]
+        signal = trading_params["signal"]
+        value = trading_params["value"]
+        conservative = trading_params["conservative"]
+        entry_strategy = trading_params["entry_strategy"]
+        exit_strategy = trading_params["exit_strategy"]
+        fee = 0.005
+        minimum_rows = int(retrack_days * 3)
         end = datetime.now().astimezone(pytz.UTC)
         start = (end - timedelta(days=30)).astimezone(pytz.UTC)
         accounts = cbs.get_accounts()
