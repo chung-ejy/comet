@@ -113,12 +113,12 @@ while live:
     # ##buys
     if balance > 1:
         offerings = les.entry_analysis(entry_strategy,merged,signal,value,conservative)
-        ##BUYS
         if offerings.index.size > 0:
             trade = offerings.iloc[0]
             buy_price = float(trade["bid"])
+            symbol = trade["product_id"].split("-")[0]
             size = round(float(balance/(buy_price*(1+fee))),6)
-            buy = cbs.place_buy("BTC",buy_price,size)
+            buy = cbs.place_buy(symbol,buy_price,size)
             comet.store("orders",pd.DataFrame([buy]))
     comet.disconnect()
     sleep(sleep_time)
