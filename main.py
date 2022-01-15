@@ -27,17 +27,17 @@ while live:
 ##CONSTANTS
     comet.cloud_connect()
     iteration_data = {"date":datetime.now(),
-                        "retrack_days" : 3
-                        ,"req" : 0.02
-                        ,"signal" : 0.01
-                        ,"value" : True
-                        ,"conservative" : True
-                        ,"entry_strategy" : "standard"
-                        ,"exit_strategy" : "hold"
-                        ,"fee" : 0.005
-                        ,"minimum_rows" : retrack_days * 3
-                        ,"live" : True
-                        ,"sleep_time" : 300}
+                        "retrack_days" : retrack_days
+                        ,"req" : req
+                        ,"signal" : signal
+                        ,"value" : value
+                        ,"conservative" : conservative
+                        ,"entry_strategy" : entry_strategy
+                        ,"exit_strategy" : exit_strategy
+                        ,"fee" : fee
+                        ,"minimum_rows" : minimum_rows
+                        ,"live" : live
+                        ,"sleep_time" : sleep_time}
     comet.store("cloud_test_iterrations",pd.DataFrame([iteration_data]))
     end = datetime.now().astimezone(pytz.UTC)
     start = (end - timedelta(days=30)).astimezone(pytz.UTC)
