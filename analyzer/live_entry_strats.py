@@ -9,6 +9,8 @@ class LiveEntryStrats(object):
                 offerings = self.signal_based(final,signal,value,conservative)
             case "parameter_defined":
                 offerings = self.parameter_defined(final,signal,value,conservative)
+            case "research_parameter_defined":
+                offerings = self.research_parameter_defined(final,signal,value,conservative)
             case "all":
                 offerings = self.all(final,signal,value,conservative)
             case _:
@@ -19,6 +21,7 @@ class LiveEntryStrats(object):
         offerings["conservative"] = conservative
         return offerings
 
+    @classmethod
     def standard(self,final,signal,value,conservative):
         if value:
             offerings = final[(final["signal"] < -signal)
@@ -29,6 +32,7 @@ class LiveEntryStrats(object):
                                 ].sort_values("signal",ascending=sorting)
         return offerings
     
+    @classmethod
     def research_parameter_defined(self,final,signal,value,conservative):
         if value:
             offerings = final[(final["signal"] < -signal)
@@ -46,6 +50,7 @@ class LiveEntryStrats(object):
                                 ].sort_values("signal",ascending=sorting)
         return offerings
     
+    @classmethod
     def parameter_defined(self,final,signal,value,conservative):
         if value:
             offerings = final[(final["signal"] < -signal)
@@ -62,7 +67,7 @@ class LiveEntryStrats(object):
                                 & (final["inflection"] <= -1))
                                 ].sort_values("signal",ascending=sorting)
         return offerings
-
+    @classmethod
     def signal_based(self,final,signal,value,conservative):
         if value:
             offerings = final[(final["signal"] < -signal)
@@ -75,6 +80,7 @@ class LiveEntryStrats(object):
                                 ].sort_values("signal",ascending=sorting)
         return offerings
     
+    @classmethod
     def all(self,final,signal,value,conservative):
         if value:
             offerings = final[(final["signal"] < -signal)

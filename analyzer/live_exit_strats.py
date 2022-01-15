@@ -1,124 +1,60 @@
 from datetime import timedelta, datetime
 import pandas as pd
-
-class ExitStrats(object):
+from processor.processor import Processor as p
+class LiveExitStrats(object):
     
     @classmethod
-    def exit_analysis(self,exit_strat,final,trade,rt,req):
+    def exit_analysis(self,exit_strat,final,order_trades,rt,req):
+        size = round(sum(order_trades["size"]),6)
+        buy_price = order_trades["price"].mean()
+        product_id = order_trades.iloc[0]["product_id"]
+        symbol = product_id.split("-")[0]
+        incomplete_trade = order_trades.iloc[0]
+        incomplete_trade["size"] = size
+        incomplete_trade["exit_strat"] = exit_strat
+        product_data =  final[(final["crypto"]==symbol)]
+        product_data["delta"] = (product_data["ask"] - buy_price) / buy_price
         match exit_strat:
             case "due_date":
-                trade = self.due_date(final,trade,rt,req)
+                analysis = self.due_date(product_data,order_trades,rt,req)
             case "hold":
-                trade = self.hold(final,trade,rt,req)
+                analysis = self.hold(product_data,order_trades,rt,req)
             case "adaptive_due_date":
-                trade = self.adaptive_due_date(final,trade,rt,req)
+                analysis = self.adaptive_due_date(product_data,order_trades,rt,req)
             case "adaptive_hold":
-                trade = self.adaptive_hold(final,trade,rt,req)
+                analysis = self.adaptive_hold(product_data,order_trades,rt,req)
             case _:
-                trade = {}
-        trade["exit_strat"] = exit_strat
-        return trade
+                analysis = {}
+        if analysis.index.size > 0:
+            incomplete_trade["sell_price"] = product_data["ask"]
+        return incomplete_trade
+
     @classmethod
     def due_date(self,final,trade,rt,req):
-        symbol = trade["crypto"]
-        exits = final[(final["date"]>trade["date"]) & (final["crypto"]==symbol)]
-        bp = trade["value"]
-        due_date = trade["date"]+timedelta(days=rt)
-        exits["delta"] = (exits["value"] - bp) / bp
-        profits = exits[(exits["delta"] >= req) & (exits["date"] <= due_date)]
-        breakeven = exits[(exits["delta"]>=0) & (exits["date"] > due_date)]
-        if profits.index.size < 1:
-            if breakeven.index.size < 1:
-                the_exit = exits[(exits["date"] > due_date)].iloc[-1]
-                trade["sell_price"] = the_exit["value"]
-                trade["type"] = "loss"
-            else:
-                the_exit = breakeven.iloc[0]
-                trade["type"] = "breakeven"
-                trade["sell_price"] = bp
-        else:
-            the_exit = profits.iloc[0]
-            trade["type"] = "profit"
-            trade["sell_price"] = bp * (1+req)
-        trade["sell_date"] = the_exit["date"]
-        trade["buy_price"] = bp
-        trade["delta"] = (trade["sell_price"] - trade["buy_price"])/ trade["buy_price"]
-        return trade
+        profits = final[(final["delta"] >= req)]
+        return profits
     
     @classmethod
     def hold(self,final,trade,rt,req):
-        symbol = trade["crypto"]
-        exits = final[(final["date"]>trade["date"]) & (final["crypto"]==symbol)]
-        bp = trade["value"]
-        exits["delta"] = (exits["value"] - bp) / bp
-        profits = exits[(exits["delta"] >= req) & (exits["date"] > trade["date"])]
-        if profits.index.size < 1:
-            the_exit = exits.iloc[-1]
-            trade["type"] = "held"
-            trade["sell_price"] = the_exit["value"]
-        else:
-            the_exit = profits.iloc[0]
-            trade["type"] = "profit"
-            trade["sell_price"] = bp * (1+req)
-        trade["sell_date"] = the_exit["date"]
-        trade["buy_price"] = bp
-        trade["delta"] = (trade["sell_price"] - trade["buy_price"])/ trade["buy_price"]
-        return trade
+        profits = final[(final["delta"] >= req)]
+        return profits
     
     @classmethod
     def adaptive_hold(self,final,trade,rt,req):
-        symbol = trade["crypto"]
-        exits = final[(final["date"]>trade["date"]) & (final["crypto"]==symbol)]
-        bp = trade["value"]
-        exits["delta"] = (exits["value"] - bp) / bp
-        profits = exits[(exits["date"] > trade["date"])
-                        & (exits["delta"] > 0)
-                        & (exits["p_sign_change"]==True)
-                        & (exits["velocity"] <= 3)
-                        & (exits["velocity"] > 0)
-                        & (exits["inflection"] <= 1)
-                        & (exits["inflection"] >= -1)]
-        if profits.index.size < 1:
-            the_exit = exits.iloc[-1]
-            trade["type"] = "held"
-        else:
-            the_exit = profits.iloc[0]
-            trade["type"] = "profit"
-        trade["sell_price"] = the_exit["value"]
-        trade["sell_date"] = the_exit["date"]
-        trade["buy_price"] = bp
-        trade["delta"] = (trade["sell_price"] - trade["buy_price"])/ trade["buy_price"]
-        return trade
+        profits = final[(final["delta"] > 0)
+                        & (final["p_sign_change"]==True)
+                        & (final["velocity"] <= 3)
+                        & (final["velocity"] > 0)
+                        & (final["inflection"] <= 1)
+                        & (final["inflection"] >= -1)]
+        return profits
     
     @classmethod
     def adaptive_due_date(self,final,trade,rt,req):
-        symbol = trade["crypto"]
-        exits = final[(final["date"]>trade["date"]) & (final["crypto"]==symbol)]
-        bp = trade["value"]
-        exits["delta"] = (exits["value"] - bp) / bp
-        due_date = trade["date"]+timedelta(days=rt)
-        profits = exits[(exits["date"] <= due_date)
-                        & (exits["delta"] >= 0)
-                        & (exits["p_sign_change"]==True)
-                        & (exits["velocity"] <= 3)
-                        & (exits["velocity"] > 0)
-                        & (exits["inflection"] <= 1)
-                        & (exits["inflection"] >= -1)].sort_values("date")
-        breakeven = exits[(exits["delta"]>=0) & (exits["date"] > due_date)].sort_values("date")
-        if profits.index.size < 1:
-            if breakeven.index.size < 1:
-                the_exit = exits[(exits["date"] > due_date)].iloc[-1]
-                trade["sell_price"] = the_exit["value"]
-                trade["type"] = "loss"
-            else:
-                the_exit = breakeven.iloc[0]
-                trade["type"] = "breakeven"
-                trade["sell_price"] = bp
-        else:
-            the_exit = profits.iloc[0]
-            trade["type"] = "profit"
-            trade["sell_price"] = the_exit["value"]
-        trade["sell_date"] = the_exit["date"]
-        trade["buy_price"] = bp
-        trade["delta"] = (trade["sell_price"] - trade["buy_price"]) / trade["buy_price"]
-        return trade
+        profits = final[(final["delta"] >= 0)
+                        & (final["p_sign_change"]==True)
+                        & (final["velocity"] <= 3)
+                        & (final["velocity"] > 0)
+                        & (final["inflection"] <= 1)
+                        & (final["inflection"] >= -1)]
+        return profits

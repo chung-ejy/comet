@@ -57,7 +57,7 @@ class ExitStrats(object):
         bp = trade["value"]
         exits["delta"] = (exits["value"] - bp) / bp
         profits = exits[(exits["date"] > trade["date"])
-                        & (exits["delta"] > 0)
+                        & (exits["delta"] > req)
                         & (exits["p_sign_change"]==True)
                         & (exits["velocity"] <= 3)
                         & (exits["velocity"] > 0)
@@ -83,7 +83,7 @@ class ExitStrats(object):
         exits["delta"] = (exits["value"] - bp) / bp
         due_date = trade["date"]+timedelta(days=rt)
         profits = exits[(exits["date"] <= due_date)
-                        & (exits["delta"] >= 0)
+                        & (exits["delta"] >= req)
                         & (exits["p_sign_change"]==True)
                         & (exits["velocity"] <= 3)
                         & (exits["velocity"] > 0)
