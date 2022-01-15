@@ -4,7 +4,7 @@ from analyzer.live_entry_strats import LiveEntryStrats as les
 from analyzer.live_exit_strats import LiveExitStrats as lxs
 from time import sleep
 from database.comet import Comet
-from coinbase.coinbase import Coinbase as cbs
+from coinbase.coinbase_sandbox import CoinbaseSandbox as cbs
 from processor.processor import Processor as p
 import pytz
 
@@ -22,6 +22,7 @@ exit_strategy = "hold"
 fee = 0.005
 minimum_rows = retrack_days * 3
 live = True
+sleep_time = 300
 while live:
 ##CONSTANTS
     comet.cloud_connect()
@@ -120,4 +121,4 @@ while live:
             buy = cbs.place_buy("BTC",buy_price,size)
             comet.store("orders",pd.DataFrame([buy]))
     comet.disconnect()
-    sleep(1800)
+    sleep(sleep_time)
