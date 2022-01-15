@@ -26,12 +26,10 @@ live = True
 
 status = "initial_load"
 comet.cloud_connect()
-# print(retrack_days,req,signal,value,conservative,entry_strategy,exit_strategy)
 sleep_time = 3600
 minimum_funds = 50
 comet.cloud_connect()
 status = "initial_load"
-# print(retrack_days,req,signal,value,conservative,entry_strategy,exit_strategy)
 while live:
     try:
         sleep_time = 3600
@@ -46,19 +44,6 @@ while live:
         exit_strategy = trading_params["exit_strategy"].item()
         fee = 0.005
         minimum_rows = int(retrack_days * 3)
-        iteration_data = {"date":datetime.now(),
-                            "retrack_days" : retrack_days
-                            ,"req" : req
-                            ,"signal" : signal
-                            ,"value" : value
-                            ,"conservative" : conservative
-                            ,"entry_strategy" : entry_strategy
-                            ,"exit_strategy" : exit_strategy
-                            ,"fee" : fee
-                            ,"minimum_rows" : minimum_rows
-                            ,"live" : live
-                            ,"sleep_time" : sleep_time}
-        comet.store("cloud_iterrations",pd.DataFrame([iteration_data]))
         end = datetime.now().astimezone(pytz.UTC)
         start = (end - timedelta(days=30)).astimezone(pytz.UTC)
         accounts = cbs.get_accounts()
