@@ -100,41 +100,37 @@ class Coinbase(object):
             url = "	https://api.exchange.coinbase.com/fills"
             product_id = f'{crypto}-USD'
             params = {
-                # "sorting":"desc"
-                #     ,"status":"pending"
-                #     ,"sortedBy":"created_at"
                     "product_id":product_id,
                     "limit":100}
             r = requests.get(url, auth=auth, params=params)
-            # results = pd.DataFrame(r.json())
             return r.json()
         except Exception as e:
             print(str(e))
             return str(e)
-    # @classmethod
-    # def create_fill_report(self,start,end):
-    #     payload = {
-    #     "start_date": start.strftime("%Y-%m-%d"),
-    #     "end_date": end.strftime("%Y-%m-%d"),
-    #     "type": "fills",
-    #     "format": "csv",
-    #     "product_id": "ALL"
-    #     }
-    #     url = "https://api.exchange.coinbase.com/reports"
-    #     auth = CoinbaseWalletAuth(API_KEY, API_SECRET, API_PASSPHRASE)
-    #     r = requests.post(url, auth=auth, json=payload)
-    #     return r.json()
+    @classmethod
+    def create_fill_report(self,start,end):
+        payload = {
+        "start_date": start.strftime("%Y-%m-%d"),
+        "end_date": end.strftime("%Y-%m-%d"),
+        "type": "fills",
+        "format": "csv",
+        "product_id": "ALL"
+        }
+        url = "https://api.exchange.coinbase.com/reports"
+        auth = CoinbaseWalletAuth(API_KEY, API_SECRET, API_PASSPHRASE)
+        r = requests.post(url, auth=auth, json=payload)
+        return r.json()
         
-    # @classmethod
-    # def get_fill_report(self):
-    #     url = "https://api.exchange.coinbase.com/reports"
-    #     auth = CoinbaseWalletAuth(API_KEY, API_SECRET, API_PASSPHRASE)
-    #     params = {
-    #                 "type":"fills",
-    #                 "limit":100
-    #             }
-    #     r = requests.get(url, auth=auth, params=params)
-    #     return r.json()
+    @classmethod
+    def get_fill_report(self):
+        url = "https://api.exchange.coinbase.com/reports"
+        auth = CoinbaseWalletAuth(API_KEY, API_SECRET, API_PASSPHRASE)
+        params = {
+                    "type":"fills",
+                    "limit":100
+                }
+        r = requests.get(url, auth=auth, params=params)
+        return r.json()
     
     @classmethod
     def place_buy(self,crypto,buy_price,size):
@@ -149,8 +145,8 @@ class Coinbase(object):
             "time_in_force": "GTC",
             "cancel_after": "day",
             "post_only": "false",
-            "price":buy_price,
-            "size":size
+            "price":round(buy_price,2),
+            "size":round(size,6)
         }
         response = requests.post(url,auth=auth,json=payload)
         return response.json()

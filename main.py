@@ -23,15 +23,26 @@ whitelist_symbols = [
                     ,'MATIC'
                     ]
 live = True
+<<<<<<< HEAD
 status = "initial_load"
 comet.cloud_connect()
 # print(retrack_days,req,signal,value,conservative,entry_strategy,exit_strategy)
+=======
+sleep_time = 3600
+minimum_funds = 50
+comet.cloud_connect()
+>>>>>>> cloud_test
 while live:
     try:
+<<<<<<< HEAD
         sleep_time = 3600
         minimum_funds = 50
         trading_params = comet.retrieve("cloud_trading_params")
         retrack_days = int(trading_params["retrack_days"].item())
+=======
+        trading_params = comet.retrieve("btc_trading_params")
+        retrack_days = trading_params["retrack_days"].item()
+>>>>>>> cloud_test
         req = trading_params["req"].item()
         signal = trading_params["signal"].item()
         value = trading_params["value"].item()
@@ -39,7 +50,24 @@ while live:
         entry_strategy = trading_params["entry_strategy"].item()
         exit_strategy = trading_params["exit_strategy"].item()
         fee = 0.005
+<<<<<<< HEAD
         minimum_rows = int(retrack_days * 3)
+=======
+        minimum_rows = retrack_days * 3
+        iteration_data = {"date":datetime.now(),
+                            "retrack_days" : retrack_days
+                            ,"req" : req
+                            ,"signal" : signal
+                            ,"value" : value
+                            ,"conservative" : conservative
+                            ,"entry_strategy" : entry_strategy
+                            ,"exit_strategy" : exit_strategy
+                            ,"fee" : fee
+                            ,"minimum_rows" : minimum_rows
+                            ,"live" : live
+                            ,"sleep_time" : sleep_time}
+        comet.store("cloud_test_iterrations",pd.DataFrame([iteration_data]))
+>>>>>>> cloud_test
         end = datetime.now().astimezone(pytz.UTC)
         start = (end - timedelta(days=30)).astimezone(pytz.UTC)
         accounts = cbs.get_accounts()
