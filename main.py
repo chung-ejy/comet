@@ -134,7 +134,15 @@ while live:
                 symbol = trade["crypto"]
                 size = round(float(balance/(buy_price*(1+fee))),6)
                 buy = cbs.place_buy(symbol,buy_price,size)
-                comet.store("cloud_test_orders",pd.DataFrame([buy]))
+                if "message" not in buy.keys():
+                    comet.store("cloud_test_orders",pd.DataFrame([buy]))
+                else:
+                    buy["date"] = datetime.now()
+                    buy["crypto"] = symbol
+                    buy["size"] = size
+                    buy["buy_price"] = buy_price
+                    buy["balance"] = balance
+                    comet.store("cloud_test_errors",pd.DataFrame([buy]))
         sleep(sleep_time)
     except Exception as e:
         error_log = {"date":datetime.now(),"message":str(e)}
