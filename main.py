@@ -24,7 +24,7 @@ whitelist_symbols = [
                     ]
 live = True
 status = "initial_load"
-comet.cloud_test_connect()
+comet.cloud_connect()
 # print(retrack_days,req,signal,value,conservative,entry_strategy,exit_strategy)
 while live:
     try:
