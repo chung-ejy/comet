@@ -13,7 +13,7 @@ class LiveExitStrats(object):
         incomplete_trade["size"] = size
         incomplete_trade["exit_strat"] = exit_strat
         product_data =  final[(final["crypto"]==symbol)]
-        product_data["delta"] = (product_data["ask"] - buy_price) / buy_price
+        product_data["delta"] = (product_data["price"] - buy_price) / buy_price
         if exit_strat == "due_date":
                 analysis = self.due_date(product_data,order_trades,rt,req)
         else:
@@ -28,7 +28,7 @@ class LiveExitStrats(object):
                     else:
                         analysis = pd.DataFrame([{}])
         if analysis.index.size > 0:
-            incomplete_trade["sell_price"] = product_data["ask"]
+            incomplete_trade["sell_price"] = product_data["price"]
         return incomplete_trade
 
     @classmethod
