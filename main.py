@@ -1,17 +1,10 @@
-import requests
 import pandas as pd
-from datetime import datetime, timedelta, date, timezone
+from datetime import datetime, timedelta
 from analyzer.live_entry_strats import LiveEntryStrats as les
 from analyzer.live_exit_strats import LiveExitStrats as lxs
 from time import sleep
-import time
 from database.comet import Comet
-from tqdm import tqdm
-<<<<<<< HEAD
 from coinbase.coinbase import Coinbase as cbs
-=======
-from coinbase.coinbase_sandbox import CoinbaseSandbox as cbs
->>>>>>> cloud_test
 from processor.processor import Processor as p
 import pytz
 
@@ -97,7 +90,7 @@ while live:
                     order_trades = incomplete_trades[incomplete_trades["order_id"]==oi]
                     if len([x for x in order_trades["settled"] if x == False]) == 0 and order_trades.index.size > 1:
                         comet.store("fills",order_trades)
-                        incomplete_trade = lxs.exit_analysis(exit_strategy,merged,order_trades,rt,req)
+                        incomplete_trade = lxs.exit_analysis(exit_strategy,merged,order_trades,retrack_days,req)
                         if "sell_price" in incomplete_trade.keys():
                             sell_statement = cbs.place_sell(incomplete_trade["product_id"]
                                                             ,incomplete_trade["sell_price"]
