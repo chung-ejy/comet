@@ -65,7 +65,7 @@ while live:
         for currency in whitelist_symbols:
             try:
                 spot = cbs.get_current_price(currency)
-                historical = cbs.get_timeframe_prices(currency,end,minimum_rows)
+                historical = cbs.get_timeframe_prices(currency,start,end,minimum_rows)
                 spot["crypto"] = currency
                 if "message" not in list(spot.keys()):
                     spots.append(spot)
