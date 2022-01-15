@@ -21,7 +21,7 @@ class Coinbase(object):
         return r.json()
     
     @classmethod
-    def get_timeframe_prices(self,crypto,end,timeframe):
+    def get_timeframe_prices(self,crypto,start,end,timeframe):
         try:
             auth = CoinbaseWalletAuth(API_KEY, API_SECRET, API_PASSPHRASE)
             product_id = f'{crypto}-USD'
