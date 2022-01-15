@@ -25,22 +25,22 @@ whitelist_symbols = [
 
 
 live = True
-sleep_time = 300
+sleep_time = 3600
 minimum_funds = 50
 comet.cloud_connect()
-trading_params = comet.retrieve("btc_trading_params")
-retrack_days = trading_params["retrack_days"].item()
-req = trading_params["req"].item()
-signal = trading_params["signal"].item()
-value = trading_params["value"].item()
-conservative = trading_params["conservative"].item()
-entry_strategy = trading_params["entry_strategy"].item()
-exit_strategy = trading_params["exit_strategy"].item()
-fee = 0.005
-minimum_rows = retrack_days * 3
 while live:
 ##CONSTANTS
     try:
+        trading_params = comet.retrieve("btc_trading_params")
+        retrack_days = trading_params["retrack_days"].item()
+        req = trading_params["req"].item()
+        signal = trading_params["signal"].item()
+        value = trading_params["value"].item()
+        conservative = trading_params["conservative"].item()
+        entry_strategy = trading_params["entry_strategy"].item()
+        exit_strategy = trading_params["exit_strategy"].item()
+        fee = 0.005
+        minimum_rows = retrack_days * 3
         iteration_data = {"date":datetime.now(),
                             "retrack_days" : retrack_days
                             ,"req" : req
