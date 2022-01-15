@@ -26,6 +26,19 @@ sleep_time = 300
 while live:
 ##CONSTANTS
     comet.cloud_connect()
+    iteration_data = {"date":datetime.now(),
+                        "retrack_days" : 3
+                        ,"req" : 0.02
+                        ,"signal" : 0.01
+                        ,"value" : True
+                        ,"conservative" : True
+                        ,"entry_strategy" : "standard"
+                        ,"exit_strategy" : "hold"
+                        ,"fee" : 0.005
+                        ,"minimum_rows" : retrack_days * 3
+                        ,"live" : True
+                        ,"sleep_time" : 300}
+    comet.store("cloud_test_iterrations",pd.DataFrame([iteration_data]))
     end = datetime.now().astimezone(pytz.UTC)
     start = (end - timedelta(days=30)).astimezone(pytz.UTC)
     accounts = cbs.get_accounts()
