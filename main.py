@@ -25,12 +25,11 @@ whitelist_symbols = [
 live = True
 status = "initial_load"
 comet.cloud_connect()
-# print(retrack_days,req,signal,value,conservative,entry_strategy,exit_strategy)
 while live:
     try:
         sleep_time = 3600
         minimum_funds = 50
-        trading_params = comet.retrieve("cloud_test_trading_params")
+        trading_params = comet.retrieve("btc_trading_params")
         retrack_days = int(trading_params["retrack_days"].item())
         req = trading_params["req"].item()
         signal = trading_params["signal"].item()
