@@ -43,7 +43,7 @@ class LiveExitStrats(object):
     
     @classmethod
     def adaptive_hold(self,final,trade,rt,req):
-        profits = final[(final["delta"] > 0)
+        profits = final[(final["delta"] > req)
                         & (final["p_sign_change"]==True)
                         & (final["velocity"] <= 3)
                         & (final["velocity"] > 0)
@@ -53,7 +53,7 @@ class LiveExitStrats(object):
     
     @classmethod
     def adaptive_due_date(self,final,trade,rt,req):
-        profits = final[(final["delta"] >= 0)
+        profits = final[(final["delta"] >= req)
                         & (final["p_sign_change"]==True)
                         & (final["velocity"] <= 3)
                         & (final["velocity"] > 0)
