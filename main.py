@@ -25,7 +25,7 @@ whitelist_symbols = [
 
 
 live = True
-sleep_time = 3600
+sleep_time = 300
 minimum_funds = 50
 comet.cloud_connect()
 trading_params = comet.retrieve("btc_trading_params")
@@ -156,8 +156,8 @@ while live:
                     buy["buy_price"] = buy_price
                     buy["balance"] = balance
                     comet.store("cloud_test_errors",pd.DataFrame([buy]))
-        sleep(sleep_time)
     except Exception as e:
         error_log = {"date":datetime.now(),"message":str(e)}
         comet.store("cloud_test_errors",pd.DataFrame([error_log]))
+    sleep(sleep_time)
 comet.disconnect()
