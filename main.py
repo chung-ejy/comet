@@ -22,6 +22,7 @@ exit_strategy = "hold"
 fee = 0.005
 minimum_rows = retrack_days * 3
 live = True
+sleep_time = 300
 while live:
 ##CONSTANTS
     comet.cloud_connect()
@@ -120,4 +121,4 @@ while live:
             buy = cbs.place_buy("BTC",buy_price,size)
             comet.store("orders",pd.DataFrame([buy]))
     comet.disconnect()
-    sleep(1800)
+    sleep(sleep_time)
