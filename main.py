@@ -134,7 +134,6 @@ while live:
                 size = round(float(balance/(buy_price*(1+fee))),6)
                 buy = cbs.place_buy(symbol,buy_price,size)
                 comet.store("cloud_test_orders",pd.DataFrame([buy]))
-
         sleep(sleep_time)
     except Exception as e:
         error_log = {"date":datetime.now(),"message":str(e)}
