@@ -111,30 +111,30 @@ class Coinbase(object):
         except Exception as e:
             print(str(e))
             return str(e)
-    @classmethod
-    def create_fill_report(self,start,end):
-        payload = {
-        "start_date": start.strftime("%Y-%m-%d"),
-        "end_date": end.strftime("%Y-%m-%d"),
-        "type": "fills",
-        "format": "csv",
-        "product_id": "ALL"
-        }
-        url = "https://api.exchange.coinbase.com/reports"
-        auth = CoinbaseWalletAuth(API_KEY, API_SECRET, API_PASSPHRASE)
-        r = requests.post(url, auth=auth, json=payload)
-        return r.json()
+    # @classmethod
+    # def create_fill_report(self,start,end):
+    #     payload = {
+    #     "start_date": start.strftime("%Y-%m-%d"),
+    #     "end_date": end.strftime("%Y-%m-%d"),
+    #     "type": "fills",
+    #     "format": "csv",
+    #     "product_id": "ALL"
+    #     }
+    #     url = "https://api.exchange.coinbase.com/reports"
+    #     auth = CoinbaseWalletAuth(API_KEY, API_SECRET, API_PASSPHRASE)
+    #     r = requests.post(url, auth=auth, json=payload)
+    #     return r.json()
         
-    @classmethod
-    def get_fill_report(self):
-        url = "https://api.exchange.coinbase.com/reports"
-        auth = CoinbaseWalletAuth(API_KEY, API_SECRET, API_PASSPHRASE)
-        params = {
-                    "type":"fills",
-                    "limit":100
-                }
-        r = requests.get(url, auth=auth, params=params)
-        return r.json()
+    # @classmethod
+    # def get_fill_report(self):
+    #     url = "https://api.exchange.coinbase.com/reports"
+    #     auth = CoinbaseWalletAuth(API_KEY, API_SECRET, API_PASSPHRASE)
+    #     params = {
+    #                 "type":"fills",
+    #                 "limit":100
+    #             }
+    #     r = requests.get(url, auth=auth, params=params)
+    #     return r.json()
     
     @classmethod
     def place_buy(self,crypto,buy_price,size):
