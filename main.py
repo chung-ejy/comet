@@ -30,8 +30,7 @@ while live:
     try:
         sleep_time = 3600
         minimum_funds = 50
-        backtest_results = comet.retrieve("trading_params")
-        trading_params = backtest_results.sort_values("pv",ascending=False).iloc[0]
+        trading_params = comet.retrieve("cloud_trading_params")
         retrack_days = int(trading_params["retrack_days"])
         req = trading_params["req"]
         signal = trading_params["signal"]
