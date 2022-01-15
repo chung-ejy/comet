@@ -149,8 +149,8 @@ class CoinbaseSandbox(object):
             "time_in_force": "GTC",
             "cancel_after": "day",
             "post_only": "false",
-            "price":buy_price,
-            "size":size
+            "price":round(buy_price,2),
+            "size":round(size,6)
         }
         response = requests.post(url,auth=auth,json=payload)
         return response.json()
