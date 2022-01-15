@@ -10,21 +10,34 @@ import pytz
 
 comet = Comet()
 
-whitelist_symbols = ['ADA', 'BTC', 'DOGE', 'ETH', 'SHIB', 'WLUNA','AVAX', 'LTC', 'DOT','MATIC']
+whitelist_symbols = [ 
+                    'BTC'
+                    # , 'ADA'
+                    # , 'DOGE'
+                    # , 'ETH'
+                    # , 'SHIB'
+                    # , 'WLUNA'
+                    # ,'AVAX'
+                    # , 'LTC'
+                    # , 'DOT'
+                    # ,'MATIC'
+                    ]
 
-retrack_days = 3
-req = 0.02
-signal = 0.01
-value = True
-conservative = True
-entry_strategy = "standard"
-exit_strategy = "hold"
-fee = 0.005
-minimum_rows = retrack_days * 3
+
 live = True
 sleep_time = 300
 minimum_funds = 50
 comet.cloud_connect()
+trading_params = comet.retrieve("btc_trading_params")
+retrack_days = trading_params["retrack_days"].item()
+req = trading_params["req"].item()
+signal = trading_params["signal"].item()
+value = trading_params["value"].item()
+conservative = trading_params["conservative"].item()
+entry_strategy = trading_params["entry_strategy"].item()
+exit_strategy = trading_params["exit_strategy"].item()
+fee = 0.005
+minimum_rows = retrack_days * 3
 while live:
 ##CONSTANTS
     try:
