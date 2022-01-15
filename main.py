@@ -36,7 +36,7 @@ while live:
     try:
         sleep_time = 3600
         minimum_funds = 50
-        trading_params = comet.retrieve("cloud_test_trading_params")
+        trading_params = comet.retrieve("cloud_trading_params")
         retrack_days = int(trading_params["retrack_days"].item())
         req = trading_params["req"].item()
         signal = trading_params["signal"].item()
@@ -58,7 +58,7 @@ while live:
                             ,"minimum_rows" : minimum_rows
                             ,"live" : live
                             ,"sleep_time" : sleep_time}
-        comet.store("cloud_test_iterrations",pd.DataFrame([iteration_data]))
+        comet.store("cloud_iterrations",pd.DataFrame([iteration_data]))
         end = datetime.now().astimezone(pytz.UTC)
         start = (end - timedelta(days=30)).astimezone(pytz.UTC)
         accounts = cbs.get_accounts()
