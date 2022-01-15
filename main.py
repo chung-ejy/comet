@@ -139,7 +139,7 @@ while live:
                             one_half["sell_price"] = complete_trade["price"]
                             comet.store("cloud_test_complete_trades",one_half)
         # ##buys
-        if balance > minimum_funds and pending_orders[pending_orders["side"]=="buy"].index.size < 1:
+        if balance > minimum_funds:
             offerings = les.entry_analysis(entry_strategy,merged,signal,value,conservative)
             if offerings.index.size > 0:
                 trade = offerings.iloc[0]
