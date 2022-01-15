@@ -4,7 +4,7 @@ from analyzer.live_entry_strats import LiveEntryStrats as les
 from analyzer.live_exit_strats import LiveExitStrats as lxs
 from time import sleep
 from database.comet import Comet
-from coinbase.coinbase_sandbox import CoinbaseSandbox as cbs
+from coinbase.coinbase import Coinbase as cbs
 from processor.processor import Processor as p
 import pytz
 
