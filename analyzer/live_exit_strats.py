@@ -14,17 +14,19 @@ class LiveExitStrats(object):
         incomplete_trade["exit_strat"] = exit_strat
         product_data =  final[(final["crypto"]==symbol)]
         product_data["delta"] = (product_data["ask"] - buy_price) / buy_price
-        match exit_strat:
-            case "due_date":
+        if exit_strat == "due_date":
                 analysis = self.due_date(product_data,order_trades,rt,req)
-            case "hold":
+        else:
+            if exit_strat =="hold":
                 analysis = self.hold(product_data,order_trades,rt,req)
-            case "adaptive_due_date":
-                analysis = self.adaptive_due_date(product_data,order_trades,rt,req)
-            case "adaptive_hold":
-                analysis = self.adaptive_hold(product_data,order_trades,rt,req)
-            case _:
-                analysis = {}
+            else:
+                if exit_strat =="adaptive_due_date":
+                    analysis = self.adaptive_due_date(product_data,order_trades,rt,req)
+                else:
+                    if exit_strat =="adaptive_hold":
+                        analysis = self.adaptive_hold(product_data,order_trades,rt,req)
+                    else:
+                        analysis = pd.DataFrame([{}])
         if analysis.index.size > 0:
             incomplete_trade["sell_price"] = product_data["ask"]
         return incomplete_trade
@@ -41,7 +43,7 @@ class LiveExitStrats(object):
     
     @classmethod
     def adaptive_hold(self,final,trade,rt,req):
-        profits = final[(final["delta"] > 0)
+        profits = final[(final["delta"] > req)
                         & (final["p_sign_change"]==True)
                         & (final["velocity"] <= 3)
                         & (final["velocity"] > 0)
@@ -51,7 +53,7 @@ class LiveExitStrats(object):
     
     @classmethod
     def adaptive_due_date(self,final,trade,rt,req):
-        profits = final[(final["delta"] >= 0)
+        profits = final[(final["delta"] >= req)
                         & (final["p_sign_change"]==True)
                         & (final["velocity"] <= 3)
                         & (final["velocity"] > 0)

@@ -2,19 +2,22 @@ import pandas as pd
 class LiveEntryStrats(object):
     @classmethod
     def entry_analysis(self,entry_strat,final,signal,value,conservative):
-        match entry_strat:
-            case "standard":
-                offerings = self.standard(final,signal,value,conservative)
-            case "signal_based":
+        if entry_strat == "standard":
+            offerings = self.standard(final,signal,value,conservative)
+        else:
+            if entry_strat == "signal_based":
                 offerings = self.signal_based(final,signal,value,conservative)
-            case "parameter_defined":
-                offerings = self.parameter_defined(final,signal,value,conservative)
-            case "research_parameter_defined":
-                offerings = self.research_parameter_defined(final,signal,value,conservative)
-            case "all":
-                offerings = self.all(final,signal,value,conservative)
-            case _:
-                offerings = pd.DataFrame([{}])
+            else:
+                if entry_strat == "parameter_defined":
+                    offerings = self.parameter_defined(final,signal,value,conservative)
+                else:
+                    if entry_strat == "research_parameter_defined":
+                        offerings = self.research_parameter_defined(final,signal,value,conservative)
+                    else:
+                        if entry_strat == "all":
+                            offerings = self.all(final,signal,value,conservative)
+                        else:
+                            offerings = pd.DataFrame([{}])
         offerings["entry_strat"] = entry_strat
         offerings["value"] = value
         offerings["signal"] = signal
