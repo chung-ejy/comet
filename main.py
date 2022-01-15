@@ -143,7 +143,7 @@ while live:
             offerings = les.entry_analysis(entry_strategy,merged,signal,value,conservative)
             if offerings.index.size > 0:
                 trade = offerings.iloc[0]
-                buy_price = float(trade["bid"])
+                buy_price = float(trade["price"])
                 symbol = trade["crypto"]
                 size = round(float(balance/(buy_price*(1+fee))),6)
                 buy = cbs.place_buy(symbol,buy_price,size)
