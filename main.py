@@ -113,9 +113,9 @@ while live:
                 for oi in incomplete_trades["order_id"].unique():
                     order_trades = incomplete_trades[incomplete_trades["order_id"]==oi]
                     if len([x for x in order_trades["settled"] if x == False]) == 0 and order_trades.index.size > 0:
-                        comet.store("cloud_fills",order_trades)
                         incomplete_trade = lxs.exit_analysis(exit_strategy,merged,order_trades,retrack_days,req)
                         if "sell_price" in incomplete_trade.keys():
+                            comet.store("cloud_fills",order_trades)
                             sell_statement = cbs.place_sell(incomplete_trade["product_id"]
                                                             ,incomplete_trade["sell_price"]
                                                             ,incomplete_trade["size"])
