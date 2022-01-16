@@ -107,12 +107,11 @@ while live:
             status = "sells"
             if new_fills.index.size > 1:
                 incomplete_trades = new_fills[(new_fills["side"]=="buy")]
-                incomplete_sells = new_fills[(new_fills["side"]=="sell")]
                 incomplete_trades["size"] = [float(x) for x in incomplete_trades["size"]]
                 incomplete_trades["price"] = [float(x) for x in incomplete_trades["price"]]
                 for oi in incomplete_trades["order_id"].unique():
                     order_trades = incomplete_trades[incomplete_trades["order_id"]==oi]
-                    if len([x for x in order_trades["settled"] if x == False]) == 0 and order_trades.index.size > 1:
+                    if len([x for x in order_trades["settled"] if x == False]) == 0 and order_trades.index.size > 0:
                         comet.store("cloud_test_fills",order_trades)
                         incomplete_trade = lxs.exit_analysis(exit_strategy,merged,order_trades,retrack_days,req)
                         if "sell_price" in incomplete_trade.keys():
