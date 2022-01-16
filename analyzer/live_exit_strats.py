@@ -15,7 +15,7 @@ class LiveExitStrats(object):
         product_data =  final[(final["crypto"]==symbol)]
         product_data["delta"] = (product_data["price"] - buy_price) / buy_price
         if exit_strat == "due_date":
-                analysis = self.due_date(product_data,order_trades,rt,req)
+            analysis = self.due_date(product_data,order_trades,rt,req)
         else:
             if exit_strat =="hold":
                 analysis = self.hold(product_data,order_trades,rt,req)

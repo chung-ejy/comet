@@ -105,7 +105,7 @@ while live:
                 existing_order_ids = []
             new_fills = fills[~fills["order_id"].isin(existing_order_ids)]
             status = "sells"
-            if new_fills.index.size > 1:
+            if new_fills.index.size > 0:
                 incomplete_trades = new_fills[(new_fills["side"]=="buy")]
                 incomplete_sells = new_fills[(new_fills["side"]=="sell")]
                 incomplete_trades["size"] = [float(x) for x in incomplete_trades["size"]]
