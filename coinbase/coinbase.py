@@ -1,7 +1,7 @@
 
 import pandas as pd
 import requests
-from datetime import date, timedelta, datetime
+from datetime import date, timedelta
 from dotenv import load_dotenv
 load_dotenv()
 import os
@@ -100,13 +100,9 @@ class Coinbase(object):
             url = "	https://api-public.sandbox.exchange.coinbase.com/fills"
             product_id = f'{crypto}-USD'
             params = {
-                # "sorting":"desc"
-                #     ,"status":"pending"
-                #     ,"sortedBy":"created_at"
                     "product_id":product_id,
                     "limit":100}
             r = requests.get(url, auth=auth, params=params)
-            # results = pd.DataFrame(r.json())
             return r.json()
         except Exception as e:
             print(str(e))

@@ -9,17 +9,6 @@ class CoinbaseWalletAuth(AuthBase):
         self.passphrase = passphrase
 
     def __call__(self, request):
-        # timestamp = str(int(time.time()))
-        # message = timestamp + request.method + request.path_url + (request.body or '')
-        # key=base64.b64decode(self.secret_key)
-        # signature = hmac.new(key,message.encode(),digestmod=hashlib.sha256).hexdigest()
-        # request.headers.update({
-        #     'CB-ACCESS-SIGN': signature,
-        #     'CB-ACCESS-TIMESTAMP': timestamp,
-        #     'CB-ACCESS-KEY': self.api_key,
-        #     'CB-ACCESS-PASSPHRASE': self.passphrase,
-        # })
-        # return request
         timestamp = str(time.time())
         message = timestamp + request.method + request.path_url + (request.body or b'').decode()
         hmac_key = base64.b64decode(self.secret_key)
