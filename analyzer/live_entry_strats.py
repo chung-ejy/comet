@@ -1,5 +1,6 @@
 import pandas as pd
 class LiveEntryStrats(object):
+
     @classmethod
     def entry_analysis(self,entry_strat,final,signal,value,conservative):
         if entry_strat == "standard":
