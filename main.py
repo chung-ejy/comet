@@ -29,8 +29,6 @@ comet.cloud_connect()
 status = "initial_load"
 while live:
     try:
-        sleep_time = 3600
-        minimum_funds = 50
         trading_params = comet.retrieve("cloud_trading_params")
         retrack_days = int(trading_params["retrack_days"].item())
         req = trading_params["req"].item()
