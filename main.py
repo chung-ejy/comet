@@ -22,7 +22,7 @@ whitelist_symbols = [
                     , 'DOT'
                     ,'MATIC'
                     ]
-live = True
+live = False
 sleep_time = 3600
 minimum_funds = 50
 comet.cloud_connect()
