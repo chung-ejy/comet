@@ -26,7 +26,7 @@ class LiveExitStrats(object):
                     else:
                         analysis = pd.DataFrame([{}])
         if analysis.index.size > 0:
-            incomplete_trade["sell_price"] = product_data["ask"]
+            incomplete_trade["sell_price"] = product_data["ask"].item()
         return incomplete_trade
 
     @classmethod

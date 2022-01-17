@@ -132,8 +132,11 @@ while live:
             completed_trade_buy_ids = []
         incomplete_trades = completed_buys[~completed_buys["order_id"].isin(completed_trade_buy_ids)]
         incomplete_trades = p.live_column_date_processing(incomplete_trades.rename(columns={"created_at":"date"}))
-        for row in incomplete_trades.iterrows():
-            order = row[1]
+        incomplete_trades= incomplete_trades[incomplete_trades["trade_id"]>37559900]
+        for oi in incomplete_trades["order_id"].unique():
+            order = incomplete_trades[incomplete_trades["order_id"]==oi] \
+                            .groupby(["order_id","product_id"]) \
+                            .agg({"created_at":"first","price":"mean","size":"sum"}).reset_index().iloc[0]
             trade = lxs.exit_analysis(exit_strategy,order,merged,req)
             if "sell_price" in trade:
                 sell_statement = cbs.place_sell(trade["product_id"]
@@ -178,7 +181,7 @@ while live:
         comet.store("cloud_test_iterations",pd.DataFrame([iteration_data]))
         sleep(sleep_time)
     except Exception as e:
-        error_log = {"date":datetime.now(),"message":str(e)}
+        error_log = {"date":datetime.now(),"status":status,"message":str(e)}
         comet.store("cloud_test_errors",pd.DataFrame([error_log]))
         sleep(sleep_time)
     comet.disconnect()
