@@ -126,27 +126,27 @@ while live:
         if completed_buys.index.size > 0:
             completed_buys["price"] = [float(x) for x in completed_buys["price"]]
             completed_buys["size"] = [float(x) for x in completed_buys["size"]]
-        completed_trades = comet.retrieve("cloud_pending_trades")
-        if completed_trades.index.size > 0:
-            completed_trade_buy_ids = list(completed_trades["order_id"].unique())
-        else:
-            completed_trade_buy_ids = []
-        incomplete_trades = completed_buys[~completed_buys["order_id"].isin(completed_trade_buy_ids)]
-        if incomplete_trades.index.size > 0:
-            incomplete_trades = p.live_column_date_processing(incomplete_trades.rename(columns={"created_at":"date"}))
-            incomplete_trades= incomplete_trades[incomplete_trades["trade_id"]>37559900]
-            for oi in incomplete_trades["order_id"].unique():
-                order = incomplete_trades[incomplete_trades["order_id"]==oi] \
-                                .groupby(["order_id","product_id"]) \
-                                .agg({"date":"first","price":"mean","size":"sum"}).reset_index().iloc[0]
-                trade = lxs.exit_analysis(exit_strategy,order,merged,req)
-                if "sell_price" in trade:
-                    sell_statement = cbs.place_sell(trade["product_id"]
-                                                                ,trade["sell_price"]
-                                                                ,trade["size"])
-                    comet.store("cloud_pending_sells",pd.DataFrame([sell_statement]))
-                    trade["sell_id"] = sell_statement["id"]
-                    comet.store("cloud_pending_trades",pd.DataFrame([trade]))
+            completed_trades = comet.retrieve("cloud_pending_trades")
+            if completed_trades.index.size > 0:
+                completed_trade_buy_ids = list(completed_trades["order_id"].unique())
+            else:
+                completed_trade_buy_ids = []
+            incomplete_trades = completed_buys[~completed_buys["order_id"].isin(completed_trade_buy_ids)]
+            if incomplete_trades.index.size > 0:
+                incomplete_trades = p.live_column_date_processing(incomplete_trades.rename(columns={"created_at":"date"}))
+                incomplete_trades= incomplete_trades[incomplete_trades["trade_id"]>37559900]
+                for oi in incomplete_trades["order_id"].unique():
+                    order = incomplete_trades[incomplete_trades["order_id"]==oi] \
+                                    .groupby(["order_id","product_id"]) \
+                                    .agg({"date":"first","price":"mean","size":"sum"}).reset_index().iloc[0]
+                    trade = lxs.exit_analysis(exit_strategy,order,merged,req)
+                    if "sell_price" in trade:
+                        sell_statement = cbs.place_sell(trade["product_id"]
+                                                                    ,trade["sell_price"]
+                                                                    ,trade["size"])
+                        comet.store("cloud_pending_sells",pd.DataFrame([sell_statement]))
+                        trade["sell_id"] = sell_statement["id"]
+                        comet.store("cloud_pending_trades",pd.DataFrame([trade]))
         status = "buys"
         data = cbs.get_orders()
         if balance > float(balance * (positions-fee)) and data.index.size < positions:
