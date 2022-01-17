@@ -176,6 +176,7 @@ while live:
                             ,"sleep_time" : sleep_time,
                             "status":status}
         comet.store("cloud_test_iterrations",pd.DataFrame([iteration_data]))
+        sleep(sleep_time)
     except Exception as e:
         error_log = {"date":datetime.now(),"message":str(e)}
         comet.store("cloud_test_errors",pd.DataFrame([error_log]))
