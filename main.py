@@ -123,8 +123,9 @@ while live:
                         comet.store("cloud_completed_sells",sell_order_trades)
         status = "sells"
         completed_buys = comet.retrieve("cloud_completed_buys")
-        completed_buys["price"] = [float(x) for x in completed_buys["price"]]
-        completed_buys["size"] = [float(x) for x in completed_buys["size"]]
+        if completed_buys.index.size > 0:
+            completed_buys["price"] = [float(x) for x in completed_buys["price"]]
+            completed_buys["size"] = [float(x) for x in completed_buys["size"]]
         completed_trades = comet.retrieve("cloud_pending_trades")
         if completed_trades.index.size > 0:
             completed_trade_buy_ids = list(completed_trades["order_id"].unique())
