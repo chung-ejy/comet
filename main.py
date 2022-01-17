@@ -56,7 +56,7 @@ while live:
                 historicals.append(historical)
             except Exception as e:
                 error_message = {"date":datetime.now(),"message":str(e),"currency":currency}
-                comet.store("cloud_test_errors",pd.DataFrame([error_message]))
+                comet.store("cloud_test_errors","status":status,pd.DataFrame([error_message]))
                 continue
         current_spots = pd.DataFrame(spots)
         current_historicals = pd.concat(historicals)
@@ -73,7 +73,7 @@ while live:
                 crypto_sim["p_sign_change"] = [row[1]["velocity"] * row[1]["inflection"] < 0 for row in crypto_sim.iterrows()]
                 ns.append(crypto_sim.iloc[-1])
             except Exception as e:
-                error_message = {"date":datetime.now(),"message":str(e),"currency":currency}
+                error_message = {"date":datetime.now(),"status":status,"message":str(e),"currency":currency}
                 comet.store("cloud_test_errors",pd.DataFrame([error_message]))
                 continue
         final = pd.DataFrame(ns)
@@ -131,20 +131,21 @@ while live:
         else:
             completed_trade_buy_ids = []
         incomplete_trades = completed_buys[~completed_buys["order_id"].isin(completed_trade_buy_ids)]
-        incomplete_trades = p.live_column_date_processing(incomplete_trades.rename(columns={"created_at":"date"}))
-        incomplete_trades= incomplete_trades[incomplete_trades["trade_id"]>37559900]
-        for oi in incomplete_trades["order_id"].unique():
-            order = incomplete_trades[incomplete_trades["order_id"]==oi] \
-                            .groupby(["order_id","product_id"]) \
-                            .agg({"created_at":"first","price":"mean","size":"sum"}).reset_index().iloc[0]
-            trade = lxs.exit_analysis(exit_strategy,order,merged,req)
-            if "sell_price" in trade:
-                sell_statement = cbs.place_sell(trade["product_id"]
-                                                            ,trade["sell_price"]
-                                                            ,trade["size"])
-                comet.store("cloud_test_pending_sells",pd.DataFrame([sell_statement]))
-                trade["sell_id"] = sell_statement["id"]
-                comet.store("cloud_test_pending_trades",pd.DataFrame([trade]))
+        if incomplete_trades.index.size > 0:
+            incomplete_trades = p.live_column_date_processing(incomplete_trades.rename(columns={"created_at":"date"}))
+            incomplete_trades= incomplete_trades[incomplete_trades["trade_id"]>37559900]
+            for oi in incomplete_trades["order_id"].unique():
+                order = incomplete_trades[incomplete_trades["order_id"]==oi] \
+                                .groupby(["order_id","product_id"]) \
+                                .agg({"created_at":"first","price":"mean","size":"sum"}).reset_index().iloc[0]
+                trade = lxs.exit_analysis(exit_strategy,order,merged,req)
+                if "sell_price" in trade:
+                    sell_statement = cbs.place_sell(trade["product_id"]
+                                                                ,trade["sell_price"]
+                                                                ,trade["size"])
+                    comet.store("cloud_test_pending_sells",pd.DataFrame([sell_statement]))
+                    trade["sell_id"] = sell_statement["id"]
+                    comet.store("cloud_test_pending_trades",pd.DataFrame([trade]))
         status = "buys"
         data = cbs.get_orders()
         if balance > 700 and data.index.size < 2:
@@ -163,6 +164,7 @@ while live:
                     buy["size"] = size
                     buy["buy_price"] = buy_price
                     buy["balance"] = balance
+                    buy["status"] = status
                     comet.store("cloud_test_errors",pd.DataFrame([buy]))
         status = "iteration_log"
         iteration_data = {"date":datetime.now(),
