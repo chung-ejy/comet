@@ -29,6 +29,7 @@ while live:
     comet.cloud_connect()
     try:
         trading_params = comet.retrieve("btc_trading_params")
+        positions =  int(trading_params["positions"].item())
         sleep_time = int(trading_params["sleep_time"].item())
         retrack_days = int(trading_params["retrack_days"].item())
         req = trading_params["req"].item()
@@ -148,13 +149,13 @@ while live:
                     comet.store("cloud_test_pending_trades",pd.DataFrame([trade]))
         status = "buys"
         data = cbs.get_orders()
-        if balance > 100 and data.index.size < 10:
+        if balance > float(balance * (positions-fee)) and data.index.size < positions:
             offerings = les.entry_analysis(entry_strategy,merged,signal,value,conservative)
             if offerings.index.size > 0:
                 trade = offerings.iloc[0]
                 buy_price = float(trade["bid"])
                 symbol = trade["crypto"]
-                size = round(float(100/(buy_price*(1+fee))),6)
+                size = round(float(balance/(buy_price*(1+fee))),6)
                 buy = cbs.place_buy(symbol,buy_price,size)
                 if "message" not in buy.keys():
                     comet.store("cloud_test_pending_buys",pd.DataFrame([buy]))
