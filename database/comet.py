@@ -9,7 +9,7 @@ class Comet(ADatabase):
     def retrieve_fills(self):
         try:
             db = self.client[self.name]
-            table = db["cloud_fills"]
+            table = db["cloud_test_fills"]
             data = table.find({},{"order_id":1,"_id":0},show_record_id=False)
             return pd.DataFrame(list(data))
         except Exception as e:
