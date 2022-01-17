@@ -170,7 +170,7 @@ while live:
         comet.cloud_connect()
         pending_trades = comet.retrieve("cloud_test_pending_trades")
         complete_sells = comet.retrieve("cloud_test_completed_sells")
-        complete_buys = comet.retrieve("cloud_test_completed_buys")["order_id"].unique()
+        complete_buys = comet.retrieve("cloud_test_completed_buys")
         complete_sell_ids = []
         complete_buy_ids = []
         if complete_sells.index.size > 0:
