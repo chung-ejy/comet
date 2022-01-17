@@ -20,16 +20,16 @@ whitelist_symbols = [
                     ,'AVAX'
                     , 'LTC'
                     , 'DOT'
-                    ,'MATIC'
+                    # ,'MATIC'
                     ]
 live = False
-sleep_time = 3600
-minimum_funds = 50
 while live:
     status = "initial_load"
     comet.cloud_connect()
     try:
         trading_params = comet.retrieve("cloud_trading_params")
+        positions =  int(trading_params["positions"].item())
+        sleep_time = int(trading_params["sleep_time"].item())
         retrack_days = int(trading_params["retrack_days"].item())
         req = trading_params["req"].item()
         signal = trading_params["signal"].item()
@@ -55,7 +55,7 @@ while live:
                     spots.append(spot)
                 historicals.append(historical)
             except Exception as e:
-                error_message = {"date":datetime.now(),"message":str(e),"currency":currency}
+                error_message = {"date":datetime.now(),"status":status,"message":str(e),"currency":currency}
                 comet.store("cloud_errors",pd.DataFrame([error_message]))
                 continue
         current_spots = pd.DataFrame(spots)
@@ -73,7 +73,7 @@ while live:
                 crypto_sim["p_sign_change"] = [row[1]["velocity"] * row[1]["inflection"] < 0 for row in crypto_sim.iterrows()]
                 ns.append(crypto_sim.iloc[-1])
             except Exception as e:
-                error_message = {"date":datetime.now(),"message":str(e),"currency":currency}
+                error_message = {"date":datetime.now(),"status":status,"message":str(e),"currency":currency}
                 comet.store("cloud_errors",pd.DataFrame([error_message]))
                 continue
         final = pd.DataFrame(ns)
@@ -81,7 +81,7 @@ while live:
         merged["ask"] = [float(x) for x in merged["ask"]]
         merged["bid"] = [float(x) for x in merged["bid"]]
         merged["price"] = [float(x) for x in merged["price"]]
-        comet.store("cloud_coinbase_hourly",merged)
+        comet.store("cloud_historicals",merged)
         fls = []
         status = "fills"
         for currency in accounts["currency"].unique():
@@ -131,26 +131,30 @@ while live:
         else:
             completed_trade_buy_ids = []
         incomplete_trades = completed_buys[~completed_buys["order_id"].isin(completed_trade_buy_ids)]
-        incomplete_trades = p.live_column_date_processing(incomplete_trades.rename(columns={"created_at":"date"}))
-        for row in incomplete_trades.iterrows():
-            order = row[1]
-            trade = lxs.exit_analysis(exit_strategy,order,merged,req)
-            if "sell_price" in trade:
-                sell_statement = cbs.place_sell(trade["product_id"]
-                                                            ,trade["sell_price"]
-                                                            ,trade["size"])
-                comet.store("cloud_pending_sells",pd.DataFrame([sell_statement]))
-                trade["sell_id"] = sell_statement["id"]
-                comet.store("cloud_pending_trades",pd.DataFrame([trade]))
+        if incomplete_trades.index.size > 0:
+            incomplete_trades = p.live_column_date_processing(incomplete_trades.rename(columns={"created_at":"date"}))
+            incomplete_trades= incomplete_trades[incomplete_trades["trade_id"]>37559900]
+            for oi in incomplete_trades["order_id"].unique():
+                order = incomplete_trades[incomplete_trades["order_id"]==oi] \
+                                .groupby(["order_id","product_id"]) \
+                                .agg({"date":"first","price":"mean","size":"sum"}).reset_index().iloc[0]
+                trade = lxs.exit_analysis(exit_strategy,order,merged,req)
+                if "sell_price" in trade:
+                    sell_statement = cbs.place_sell(trade["product_id"]
+                                                                ,trade["sell_price"]
+                                                                ,trade["size"])
+                    comet.store("cloud_pending_sells",pd.DataFrame([sell_statement]))
+                    trade["sell_id"] = sell_statement["id"]
+                    comet.store("cloud_pending_trades",pd.DataFrame([trade]))
         status = "buys"
         data = cbs.get_orders()
-        if balance > 900 and data.index.size < 1:
+        if balance > float(balance * (positions-fee)) and data.index.size < positions:
             offerings = les.entry_analysis(entry_strategy,merged,signal,value,conservative)
             if offerings.index.size > 0:
                 trade = offerings.iloc[0]
                 buy_price = float(trade["bid"])
                 symbol = trade["crypto"]
-                size = round(float(100/(buy_price*(1+fee))),6)
+                size = round(float(balance/(buy_price*(1+fee))),6)
                 buy = cbs.place_buy(symbol,buy_price,size)
                 if "message" not in buy.keys():
                     comet.store("cloud_pending_buys",pd.DataFrame([buy]))
@@ -160,7 +164,28 @@ while live:
                     buy["size"] = size
                     buy["buy_price"] = buy_price
                     buy["balance"] = balance
+                    buy["status"] = status
                     comet.store("cloud_errors",pd.DataFrame([buy]))
+        status = "recording completed_trades"
+        comet.cloud_connect()
+        pending_trades = comet.retrieve("cloud_pending_trades")
+        complete_trades = comet.retrieve("cloud_completed_trades")
+        complete_sells = comet.retrieve("cloud_completed_sells")
+        complete_buys = comet.retrieve("cloud_completed_buys")
+        complete_sell_ids = []
+        complete_buy_ids = []
+        complete_trade_ids = []
+        if complete_sells.index.size > 0:
+            complete_sell_ids = complete_sells["order_id"].unique()
+        if complete_buys.index.size > 0:
+            complete_buy_ids = complete_buys["order_id"].unique()
+        if complete_trades.index.size > 0:
+            complete_trade_ids = complete_trades["order_id"].unique()
+        if pending_trades.index.size > 0:
+            complete_trades = pending_trades[(~pending_trades["order_id"].isin(complete_trade_ids)) & (pending_trades["order_id"].isin(complete_buy_ids)) & (pending_trades["sell_id"].isin(complete_sell_ids))]
+            complete_trades["fee"] = [float(x) for x in complete_trades["fee"]]
+            ct = complete_trades.groupby(["product_id","order_id"]).agg({"sell_price":"mean","size":"sum","fee":"sum","price":"mean","date":"first"}).reset_index()
+            comet.store("cloud_completed_trades",ct)
         status = "iteration_log"
         iteration_data = {"date":datetime.now(),
                             "retrack_days" : retrack_days
@@ -175,9 +200,10 @@ while live:
                             ,"live" : live
                             ,"sleep_time" : sleep_time,
                             "status":status}
-        comet.store("cloud_iterrations",pd.DataFrame([iteration_data]))
+        comet.store("cloud_iterations",pd.DataFrame([iteration_data]))
         sleep(sleep_time)
     except Exception as e:
-        error_log = {"date":datetime.now(),"message":str(e)}
+        error_log = {"date":datetime.now(),"status":status,"message":str(e)}
         comet.store("cloud_errors",pd.DataFrame([error_log]))
+        sleep(sleep_time)
     comet.disconnect()
