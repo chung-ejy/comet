@@ -180,4 +180,5 @@ while live:
     except Exception as e:
         error_log = {"date":datetime.now(),"message":str(e)}
         comet.store("cloud_test_errors",pd.DataFrame([error_log]))
+        sleep(sleep_time)
     comet.disconnect()
