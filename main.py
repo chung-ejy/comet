@@ -81,7 +81,7 @@ while live:
         merged["ask"] = [float(x) for x in merged["ask"]]
         merged["bid"] = [float(x) for x in merged["bid"]]
         merged["price"] = [float(x) for x in merged["price"]]
-        comet.store("cloud_test_coinbase_hourly",merged)
+        comet.store("cloud_test_historicals",merged)
         fls = []
         status = "fills"
         for currency in accounts["currency"].unique():
@@ -175,7 +175,7 @@ while live:
                             ,"live" : live
                             ,"sleep_time" : sleep_time,
                             "status":status}
-        comet.store("cloud_test_iterrations",pd.DataFrame([iteration_data]))
+        comet.store("cloud_test_iterations",pd.DataFrame([iteration_data]))
         sleep(sleep_time)
     except Exception as e:
         error_log = {"date":datetime.now(),"message":str(e)}
