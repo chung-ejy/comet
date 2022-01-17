@@ -102,7 +102,7 @@ while live:
             else:
                 existing_order_ids = []
             new_fills = fills[~fills["order_id"].isin(existing_order_ids)]
-            status = "sells"
+            status = "fills"
             if new_fills.index.size > 0:
                 new_buys = new_fills[new_fills["side"]=="buy"]
                 new_buys["size"] = [float(x) for x in new_buys["size"]]
