@@ -166,6 +166,22 @@ while live:
                     buy["balance"] = balance
                     buy["status"] = status
                     comet.store("cloud_test_errors",pd.DataFrame([buy]))
+        status = "recording completed_trades"
+        comet.cloud_connect()
+        pending_trades = comet.retrieve("cloud_test_pending_trades")
+        complete_sells = comet.retrieve("cloud_test_completed_sells")
+        complete_buys = comet.retrieve("cloud_test_completed_buys")["order_id"].unique()
+        complete_sell_ids = []
+        complete_buy_ids = []
+        if complete_sells.index.size > 0:
+            complete_sell_ids = complete_sells["order_id"].unique()
+        if complete_buys.index.size > 0:
+            complete_buy_ids = complete_buys["order_id"].unique()
+        if pending_trades.index.size > 0:
+            complete_trades = pending_trades[(pending_trades["order_id"].isin(complete_buy_ids)) & (pending_trades["sell_id"].isin(complete_sell_ids))]
+            complete_trades["fee"] = [float(x) for x in complete_trades["fee"]]
+            ct = complete_trades.groupby(["product_id","order_id"]).agg({"sell_price":"mean","size":"sum","fee":"sum","price":"mean","date":"first"}).reset_index()
+            comet.store("cloud_test_completed_trades",ct)
         status = "iteration_log"
         iteration_data = {"date":datetime.now(),
                             "retrack_days" : retrack_days
