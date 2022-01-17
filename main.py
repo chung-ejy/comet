@@ -142,7 +142,7 @@ while live:
                     trade = lxs.exit_analysis(exit_strategy,order,merged,req)
                     if "sell_price" in trade:
                         sell_statement = cbs.place_sell(trade["product_id"]
-                                                                    ,trade["sell_price"]
+                                                                    ,round(trade["sell_price"],2)
                                                                     ,trade["size"])
                         comet.store("cloud_pending_sells",pd.DataFrame([sell_statement]))
                         trade["sell_id"] = sell_statement["id"]
