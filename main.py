@@ -144,7 +144,7 @@ while live:
                 comet.store("cloud_test_pending_trades",pd.DataFrame([trade]))
         status = "buys"
         data = cbs.get_orders()
-        if balance > 900 and data.index.size < 1:
+        if balance > 900 and data.index.size < 2:
             offerings = les.entry_analysis(entry_strategy,merged,signal,value,conservative)
             if offerings.index.size > 0:
                 trade = offerings.iloc[0]
