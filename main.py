@@ -142,7 +142,7 @@ while live:
                     trade = lxs.exit_analysis(exit_strategy,order,merged,req)
                     if "sell_price" in trade:
                         sell_statement = cbs.place_sell(trade["product_id"]
-                                                                    ,round(trade["sell_price"],2)
+                                                                    ,trade["sell_price"]
                                                                     ,trade["size"])
                         comet.store("cloud_pending_sells",pd.DataFrame([sell_statement]))
                         trade["sell_id"] = sell_statement["id"]
@@ -153,9 +153,12 @@ while live:
             offerings = les.entry_analysis(entry_strategy,merged,signal,value,conservative)
             if offerings.index.size > 0:
                 trade = offerings.iloc[0]
-                buy_price = round(float(trade["bid"]),2)
+                buy_price = float(trade["bid"])
                 symbol = trade["crypto"]
-                size = round(float(balance/(buy_price*(1+fee))),6)
+                if buy_price > 1:
+                    size = round(float(balance/(buy_price*(1+fee))),2)
+                else:
+                    size = round(float(balance/(buy_price*(1+fee))),6)
                 buy = cbs.place_buy(symbol,buy_price,size)
                 if "message" not in buy.keys():
                     comet.store("cloud_pending_buys",pd.DataFrame([buy]))
