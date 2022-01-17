@@ -23,3 +23,4 @@ class Comet(ADatabase):
             return pd.DataFrame(list(data))
         except Exception as e:
             print(self.name,"incomplete_trades",str(e))
+    

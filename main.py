@@ -25,9 +25,9 @@ whitelist_symbols = [
 live = True
 sleep_time = 3600
 minimum_funds = 50
-comet.cloud_connect()
-status = "initial_load"
 while live:
+    status = "initial_load"
+    comet.cloud_connect()
     try:
         trading_params = comet.retrieve("btc_trading_params")
         retrack_days = int(trading_params["retrack_days"].item())
@@ -43,8 +43,6 @@ while live:
         start = (end - timedelta(days=30)).astimezone(pytz.UTC)
         accounts = cbs.get_accounts()
         balance = accounts[accounts["currency"]=="USD"]["balance"].iloc[0]
-        pending_orders = cbs.get_orders()
-        pending_orders = p.live_column_date_processing(pending_orders.rename(columns={"created_at":"date"}))
         spots = []
         historicals = []
         status = "spots"
@@ -94,7 +92,7 @@ while live:
                     fls.append(f)
                 except:
                     continue
-        ## sells
+        ## documenting_fills
         if len(fls) > 0:
             fills = pd.concat(fls)
             #store_non_existing_executed_buy
@@ -106,45 +104,56 @@ while live:
             new_fills = fills[~fills["order_id"].isin(existing_order_ids)]
             status = "sells"
             if new_fills.index.size > 0:
-                incomplete_trades = new_fills[(new_fills["side"]=="buy")]
-                incomplete_trades["size"] = [float(x) for x in incomplete_trades["size"]]
-                incomplete_trades["price"] = [float(x) for x in incomplete_trades["price"]]
-                for oi in incomplete_trades["order_id"].unique():
-                    order_trades = incomplete_trades[incomplete_trades["order_id"]==oi]
+                new_buys = new_fills[new_fills["side"]=="buy"]
+                new_buys["size"] = [float(x) for x in new_buys["size"]]
+                new_buys["price"] = [float(x) for x in new_buys["price"]]
+                for oi in new_buys["order_id"].unique():
+                    order_trades = new_buys[new_buys["order_id"]==oi]
                     if len([x for x in order_trades["settled"] if x == False]) == 0 and order_trades.index.size > 0:
-                        incomplete_trade = lxs.exit_analysis(exit_strategy,merged,order_trades,retrack_days,req)
-                        if "sell_price" in incomplete_trade.keys():
-                            comet.store("cloud_test_test_fills",order_trades)
-                            sell_statement = cbs.place_sell(incomplete_trade["product_id"]
-                                                            ,incomplete_trade["sell_price"]
-                                                            ,incomplete_trade["size"])
-                            comet.store("cloud_test_orders",pd.DataFrame([sell_statement]))
-                            incomplete_trade["sell_id"] = sell_statement["id"]
-                            comet.store("cloud_test_incomplete_trades",pd.DataFrame([incomplete_trade]))
+                        comet.store("cloud_test_fills",order_trades)
+                        comet.store("cloud_test_completed_buys",order_trades)
                 status = "trade_completes"
-                completed_trades = new_fills[(new_fills["side"]=="sell")]
-                for soi in completed_trades["order_id"].unique():
-                    sell_order_trades = completed_trades[completed_trades["order_id"]==soi]
+                new_sells = new_fills[(new_fills["side"]=="sell")]
+                new_sells["size"] = [float(x) for x in new_sells["size"]]
+                new_sells["price"] = [float(x) for x in new_sells["price"]]
+                for soi in new_sells["order_id"].unique():
+                    sell_order_trades = new_sells[new_sells["order_id"]==soi]
                     if len([x for x in sell_order_trades["settled"] if x == False]) == 0:
                         comet.store("cloud_test_fills",sell_order_trades)
-                        complete_trade = sell_order_trades.iloc[0]
-                        order_id = complete_trade["order_id"]
-                        one_half = comet.retrieve_incomplete_trade(order_id)
-                        one_half["sell_date"] = complete_trade["created_at"]
-                        one_half["sell_price"] = complete_trade["price"]
-                        comet.store("cloud_test_complete_trades",one_half)
-        # ##buys
+                        comet.store("cloud_test_completed_sells",sell_order_trades)
+        status = "sells"
+        completed_buys = comet.retrieve("cloud_test_completed_buys")
+        completed_buys["price"] = [float(x) for x in completed_buys["price"]]
+        completed_buys["size"] = [float(x) for x in completed_buys["size"]]
+        completed_trades = comet.retrieve("cloud_test_pending_trades")
+        if completed_trades.index.size > 0:
+            completed_trade_buy_ids = list(completed_trades["order_id"].unique())
+        else:
+            completed_trade_buy_ids = []
+        incomplete_trades = completed_buys[~completed_buys["order_id"].isin(completed_trade_buy_ids)]
+        incomplete_trades = p.live_column_date_processing(incomplete_trades.rename(columns={"created_at":"date"}))
+        for row in incomplete_trades.iterrows():
+            order = row[1]
+            trade = lxs.exit_analysis(exit_strategy,order,merged,req)
+            if "sell_price" in trade:
+                sell_statement = cbs.place_sell(trade["product_id"]
+                                                            ,trade["sell_price"]
+                                                            ,trade["size"])
+                comet.store("cloud_test_pending_sells",pd.DataFrame([sell_statement]))
+                trade["sell_id"] = sell_statement["id"]
+                comet.store("cloud_test_pending_trades",pd.DataFrame([trade]))
         status = "buys"
-        if balance > minimum_funds:
+        data = cbs.get_orders()
+        if balance > 900 and data.index.size < 1:
             offerings = les.entry_analysis(entry_strategy,merged,signal,value,conservative)
             if offerings.index.size > 0:
                 trade = offerings.iloc[0]
-                buy_price = float(trade["price"])
+                buy_price = float(trade["bid"])
                 symbol = trade["crypto"]
-                size = round(float(balance/(buy_price*(1+fee))),6)
+                size = round(float(100/(buy_price*(1+fee))),6)
                 buy = cbs.place_buy(symbol,buy_price,size)
                 if "message" not in buy.keys():
-                    comet.store("cloud_test_orders",pd.DataFrame([buy]))
+                    comet.store("cloud_test_pending_buys",pd.DataFrame([buy]))
                 else:
                     buy["date"] = datetime.now()
                     buy["crypto"] = symbol
@@ -152,6 +161,7 @@ while live:
                     buy["buy_price"] = buy_price
                     buy["balance"] = balance
                     comet.store("cloud_test_errors",pd.DataFrame([buy]))
+        status = "iteration_log"
         iteration_data = {"date":datetime.now(),
                             "retrack_days" : retrack_days
                             ,"req" : req
@@ -169,5 +179,4 @@ while live:
     except Exception as e:
         error_log = {"date":datetime.now(),"message":str(e)}
         comet.store("cloud_test_errors",pd.DataFrame([error_log]))
-    sleep(sleep_time)
-comet.disconnect()
+    comet.disconnect()
