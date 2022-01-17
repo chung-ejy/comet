@@ -20,7 +20,7 @@ whitelist_symbols = [
                     ,'AVAX'
                     , 'LTC'
                     , 'DOT'
-                    # ,'MATIC'
+                    ,'MATIC'
                     ]
 live = True
 while live:
@@ -153,7 +153,7 @@ while live:
             offerings = les.entry_analysis(entry_strategy,merged,signal,value,conservative)
             if offerings.index.size > 0:
                 trade = offerings.iloc[0]
-                buy_price = float(trade["bid"])
+                buy_price = round(float(trade["bid"]),2)
                 symbol = trade["crypto"]
                 size = round(float(balance/(buy_price*(1+fee))),6)
                 buy = cbs.place_buy(symbol,buy_price,size)
