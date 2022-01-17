@@ -55,8 +55,8 @@ while live:
                     spots.append(spot)
                 historicals.append(historical)
             except Exception as e:
-                error_message = {"date":datetime.now(),"message":str(e),"currency":currency}
-                comet.store("cloud_test_errors","status":status,pd.DataFrame([error_message]))
+                error_message = {"date":datetime.now(),"status":status,"message":str(e),"currency":currency}
+                comet.store("cloud_test_errors",pd.DataFrame([error_message]))
                 continue
         current_spots = pd.DataFrame(spots)
         current_historicals = pd.concat(historicals)
