@@ -137,7 +137,7 @@ while live:
             for oi in incomplete_trades["order_id"].unique():
                 order = incomplete_trades[incomplete_trades["order_id"]==oi] \
                                 .groupby(["order_id","product_id"]) \
-                                .agg({"created_at":"first","price":"mean","size":"sum"}).reset_index().iloc[0]
+                                .agg({"date":"first","price":"mean","size":"sum"}).reset_index().iloc[0]
                 trade = lxs.exit_analysis(exit_strategy,order,merged,req)
                 if "sell_price" in trade:
                     sell_statement = cbs.place_sell(trade["product_id"]
