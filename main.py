@@ -12,14 +12,14 @@ comet = Comet()
 
 whitelist_symbols = [ 
                     'BTC'
-                    # , 'ADA'
-                    # , 'DOGE'
-                    # , 'ETH'
-                    # , 'SHIB'
+                    , 'ADA'
+                    , 'DOGE'
+                    , 'ETH'
+                    , 'SHIB'
                     # , 'WLUNA'
-                    # ,'AVAX'
-                    # , 'LTC'
-                    # , 'DOT'
+                    ,'AVAX'
+                    , 'LTC'
+                    , 'DOT'
                     # ,'MATIC'
                     ]
 live = True
