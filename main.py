@@ -10,18 +10,18 @@ import pytz
 
 comet = Comet()
 
-whitelist_symbols = [ 
-                    'BTC'
-                    , 'ADA'
-                    , 'DOGE'
-                    , 'ETH'
-                    , 'SHIB'
-                    # , 'WLUNA'
-                    ,'AVAX'
-                    , 'LTC'
-                    , 'DOT'
-                    # ,'MATIC'
-                    ]
+whitelist_symbols = [
+            'ADA', 
+            'BTC'
+           'DOGE', 
+           'ETH', 
+           'SHIB', 
+#            'LUNA',
+           'MATIC',
+           'AVAX', 
+            'LTC', 
+            'DOT'
+        ]
 live = True
 while live:
     status = "initial_load"
