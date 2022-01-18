@@ -155,8 +155,8 @@ while live:
                 trade = offerings.iloc[0]
                 buy_price = float(trade["bid"])
                 symbol = trade["crypto"]
-                round_value = 1
-                for i in range(9):
+                round_value = 2
+                for i in range(2,9):
                     if float(balance / buy_price) > 10 **-i:
                         round_value = i + 1
                         break
