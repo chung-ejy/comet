@@ -171,7 +171,6 @@ class Coinbase(object):
             "side": "sell",
             "stp": "dc",
             "time_in_force": "GTC",
-            "cancel_after": "day",
             "post_only": "false",
             "price":round(sell_price,2),
             "size":round(size,6)
