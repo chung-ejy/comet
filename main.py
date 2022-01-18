@@ -27,7 +27,7 @@ while live:
     status = "initial_load"
     comet.cloud_connect()
     try:
-        trading_params = comet.retrieve("btc_trading_params")
+        trading_params = comet.retrieve("cloud_trading_params")
         positions =  int(trading_params["positions"].item())
         sleep_time = int(trading_params["sleep_time"].item())
         retrack_days = int(trading_params["retrack_days"].item())
