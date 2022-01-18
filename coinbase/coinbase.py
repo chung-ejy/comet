@@ -142,7 +142,7 @@ class Coinbase(object):
             "type": "limit",
             "side": "buy",
             "stp": "dc",
-            "time_in_force": "GTC",
+            "time_in_force": "GTT",
             "cancel_after": "day",
             "post_only": "false",
             "price":round(buy_price,2),
@@ -171,7 +171,6 @@ class Coinbase(object):
             "side": "sell",
             "stp": "dc",
             "time_in_force": "GTC",
-            "cancel_after": "day",
             "post_only": "false",
             "price":round(sell_price,2),
             "size":round(size,6)
