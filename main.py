@@ -43,6 +43,7 @@ while live:
         start = (end - timedelta(days=30)).astimezone(pytz.UTC)
         accounts = cbs.get_accounts()
         balance = accounts[accounts["currency"]=="USD"]["balance"].iloc[0]
+        pv = sum(accounts["balance"])
         spots = []
         historicals = []
         status = "spots"
@@ -149,7 +150,7 @@ while live:
                         comet.store("cloud_test_pending_trades",pd.DataFrame([trade]))
         status = "buys"
         data = cbs.get_orders()
-        if balance > float(balance * (positions-fee)) and data.index.size < positions:
+        if balance > float(pv * (positions-fee)) and data.index.size < positions:
             offerings = les.entry_analysis(entry_strategy,merged,signal,value,conservative)
             if offerings.index.size > 0:
                 trade = offerings.iloc[0]
