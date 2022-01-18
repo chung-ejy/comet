@@ -155,10 +155,14 @@ while live:
                 trade = offerings.iloc[0]
                 buy_price = float(trade["bid"])
                 symbol = trade["crypto"]
-                if buy_price > 1:
-                    size = round(float(balance/(buy_price*(1+fee))),2)
-                else:
-                    size = round(float(balance/(buy_price*(1+fee))),6)
+                round_value = 1
+                for i in range(9):
+                    if float(balance / buy_price) > 10 **-i:
+                        round_value = i + 1
+                        break
+                    else:
+                        continue
+                size = round(float(balance/(buy_price*(1+fee))),round_value)
                 buy = cbs.place_buy(symbol,buy_price,size)
                 if "message" not in buy.keys():
                     comet.store("cloud_test_pending_buys",pd.DataFrame([buy]))
