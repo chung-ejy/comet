@@ -150,7 +150,8 @@ while live:
                         comet.store("cloud_pending_trades",pd.DataFrame([trade]))
         status = "buys"
         data = cbs.get_orders()
-        if balance > float(pv * (positions-fee)) and data.index.size < positions:
+        allocation = float(pv / (positions * (1 + fee)))
+        if balance >= allocation  and data.index.size < positions:
             offerings = les.entry_analysis(entry_strategy,merged,signal,value,conservative)
             if offerings.index.size > 0:
                 trade = offerings.iloc[0]
@@ -158,12 +159,12 @@ while live:
                 symbol = trade["crypto"]
                 round_value = 2
                 for i in range(2,9):
-                    if float(balance / buy_price) > 10 **-i:
+                    if float(allocation / buy_price) > 10 **-i:
                         round_value = i + 1
                         break
                     else:
                         continue
-                size = round(float(balance/(buy_price*(1+fee))),round_value)
+                size = round(float(allocation/buy_price),round_value)
                 buy = cbs.place_buy(symbol,buy_price,size)
                 if "message" not in buy.keys():
                     comet.store("cloud_pending_buys",pd.DataFrame([buy]))
