@@ -12,15 +12,15 @@ comet = Comet()
 
 whitelist_symbols = [
             'ADA', 
-            'BTC'
+            'BTC',
            'DOGE', 
            'ETH', 
            'SHIB', 
 #            'LUNA',
            'MATIC',
            'AVAX', 
-            'LTC', 
-            'DOT'
+            'LTC',
+            # 'DOT'
         ]
 live = True
 while live:

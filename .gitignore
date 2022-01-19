@@ -18,3 +18,5 @@ data/
 */catboost_info/
 */share/
 research/
+bin/
+lib/
