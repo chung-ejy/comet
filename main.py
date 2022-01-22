@@ -1,13 +1,16 @@
 import pandas as pd
 from datetime import datetime, timedelta
-from analyzer.live_entry_strats import LiveEntryStrats as les
-from analyzer.live_exit_strats import LiveExitStrats as lxs
 from time import sleep
 from database.comet import Comet
 from coinbase.coinbase import Coinbase as cbs
 from processor.processor import Processor as p
+from comet_historian.comet_historian import CometHistorian as comet_hist
 import pytz
-
+import requests as r
+import os
+from dotenv import load_dotenv
+load_dotenv()
+os.getenv("HISTORIANKEY")
 comet = Comet()
 
 whitelist_symbols = [ 
@@ -140,7 +143,7 @@ while live:
                     order = incomplete_trades[incomplete_trades["order_id"]==oi] \
                                     .groupby(["order_id","product_id"]) \
                                     .agg({"date":"first","price":"mean","size":"sum"}).reset_index().iloc[0]
-                    trade = lxs.exit_analysis(exit_strategy,order,merged,req)
+                    trade = comet_hist.exit_analysis(exit_strategy,order,merged,req)
                     if "sell_price" in trade:
                         sell_statement = cbs.place_sell(trade["product_id"]
                                                                     ,trade["sell_price"]
@@ -151,7 +154,8 @@ while live:
         status = "buys"
         data = cbs.get_orders()
         if balance > float(pv * (positions-fee)) and data.index.size < positions:
-            offerings = les.entry_analysis(entry_strategy,merged,signal,value,conservative)
+            offerings = comet_hist.entry_analysis(entry_strategy,merged,signal,value,conservative)
+            offerings = pd.DataFrame(offerings)
             if offerings.index.size > 0:
                 trade = offerings.iloc[0]
                 buy_price = float(trade["bid"])
