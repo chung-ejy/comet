@@ -198,7 +198,8 @@ while live:
             complete_trades = pending_trades[(~pending_trades["order_id"].isin(complete_trade_ids)) & (pending_trades["order_id"].isin(complete_buy_ids)) & (pending_trades["sell_id"].isin(complete_sell_ids))]
             complete_trades["fee"] = [float(x) for x in complete_trades["fee"]]
             ct = complete_trades.groupby(["product_id","order_id"]).agg({"sell_price":"mean","size":"sum","fee":"sum","price":"mean","date":"first"}).reset_index()
-            comet.store("cloud_test_completed_trades",ct)
+            if ct.index.size > 0:
+                comet.store("cloud_test_completed_trades",ct)
         status = "iteration_log"
         iteration_data = {"date":datetime.now(),
                             "retrack_days" : retrack_days
