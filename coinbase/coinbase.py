@@ -5,15 +5,18 @@ from datetime import date, timedelta
 from coinbase.coinbase_wallet_auth import CoinbaseWalletAuth
 
 class Coinbase(object):
-    def __init__(self,api_key,api_secret,api_passphrase):
+    def __init__(self,version,api_key,api_secret,api_passphrase):
         self.api_key = api_key
         self.api_secret = api_secret
         self.api_passphrase = api_passphrase
-
+        if version == "test":
+            self.base_url = "https://api-public.sandbox.exchange.coinbase.com"
+        else:
+            self.base_url = "https://api.exchange.coinbase.com"
     def get_current_price(self,crypto):
         auth = CoinbaseWalletAuth(self.api_key,self.api_secret,self.api_passphrase)
         product_id = f'{crypto}-USD'
-        url = f"https://api-public.sandbox.exchange.coinbase.com/products/{product_id}/ticker"
+        url = f"{self.base_url}/products/{product_id}/ticker"
         r = requests.get(url, auth=auth)
         return r.json()
     
@@ -22,7 +25,7 @@ class Coinbase(object):
             auth = CoinbaseWalletAuth(self.api_key,self.api_secret,self.api_passphrase)
             product_id = f'{crypto}-USD'
             start = end - timedelta(days=timeframe)
-            url = f"https://api-public.sandbox.exchange.coinbase.com/products/{product_id}/candles"            
+            url = f"{self.base_url}/products/{product_id}/candles"            
             params = {"granularity":86400,
                      "start":start.strftime("%Y-%m-%d"),
                      "end":end.strftime("%Y-%m-%d")}
@@ -42,7 +45,7 @@ class Coinbase(object):
         try:
             auth = CoinbaseWalletAuth(self.api_key,self.api_secret,self.api_passphrase)
             product_id = f'{crypto}-USD'
-            url = f"https://api-public.sandbox.exchange.coinbase.com/products/{product_id}/candles"            
+            url = f"{self.base_url}/products/{product_id}/candles"            
             params = {"granularity":86400,
                      "start":start.strftime("%Y-%m-%d"),
                      "end":end.strftime("%Y-%m-%d")}
@@ -61,7 +64,7 @@ class Coinbase(object):
     def get_accounts(self):
         try:
             auth = CoinbaseWalletAuth(self.api_key,self.api_secret,self.api_passphrase)
-            api_url = "	https://api-public.sandbox.exchange.coinbase.com/accounts"
+            api_url = f"{self.base_url}/accounts"
             r = requests.get(api_url, auth=auth)
             results = pd.DataFrame(r.json())
             results["balance"] = results["balance"].astype(float)
@@ -74,7 +77,7 @@ class Coinbase(object):
     def get_orders(self):
         try:
             auth = CoinbaseWalletAuth(self.api_key,self.api_secret,self.api_passphrase)
-            url = "	https://api-public.sandbox.exchange.coinbase.com/orders"
+            url = f"{self.base_url}/orders"
             params = {"sorting":"desc"
                     ,"status":"open"
                     ,"sortedBy":"created_at"
@@ -89,7 +92,7 @@ class Coinbase(object):
     def get_fill(self,crypto):
         try:
             auth = CoinbaseWalletAuth(self.api_key,self.api_secret,self.api_passphrase)
-            url = "	https://api-public.sandbox.exchange.coinbase.com/fills"
+            url = f"{self.base_url}/fills"
             product_id = f'{crypto}-USD'
             params = {
                     "product_id":product_id,
@@ -107,13 +110,13 @@ class Coinbase(object):
         "format": "csv",
         "product_id": "ALL"
         }
-        url = "https://api-public.sandbox.exchange.coinbase.com/reports"
+        url =f"{self.base_url}/reports"
         auth = CoinbaseWalletAuth(self.api_key,self.api_secret,self.api_passphrase)
         r = requests.post(url, auth=auth, json=payload)
         return r.json()
         
     def get_fill_report(self):
-        url = "https://api-public.sandbox.exchange.coinbase.com/reports"
+        url =f"{self.base_url}/reports"
         auth = CoinbaseWalletAuth(self.api_key,self.api_secret,self.api_passphrase)
         params = {
                     "type":"fills",
@@ -124,7 +127,7 @@ class Coinbase(object):
     
     def place_buy(self,crypto,buy_price,size):
         auth = CoinbaseWalletAuth(self.api_key,self.api_secret,self.api_passphrase)
-        url = "	https://api-public.sandbox.exchange.coinbase.com/orders"
+        url = f"{self.base_url}/orders"
         product_id = f'{crypto}-USD'
         payload = {
             "product_id": product_id,
@@ -142,7 +145,7 @@ class Coinbase(object):
     
     def cancel_order(self,order_id):
         auth = CoinbaseWalletAuth(self.api_key,self.api_secret,self.api_passphrase)
-        url = "	https://api-public.sandbox.exchange.coinbase.com/orders"
+        url = f"{self.base_url}/orders"
         params = {
             "order_id":order_id
         }
@@ -151,7 +154,7 @@ class Coinbase(object):
 
     def place_sell(self,product_id,sell_price,size):
         auth = CoinbaseWalletAuth(self.api_key,self.api_secret,self.api_passphrase)
-        url = "	https://api-public.sandbox.exchange.coinbase.com/orders"
+        url = f"{self.base_url}/orders"
         payload = {
             "product_id": product_id,
             "type": "limit",

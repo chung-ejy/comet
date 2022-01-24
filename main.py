@@ -7,25 +7,23 @@ from processor.processor import Processor as p
 from comet_historian.comet_historian import CometHistorian as comet_hist
 from comet_roster.comet_roster import CometRoster as comet_roster
 import pytz
-import requests as r
-import os
 comet = Comet()
 whitelist_symbols = [ 
                     'BTC'
                     ]
 status = "initial_load"
-bot_version = "test"
-roster = pd.DataFrame(comet_roster.get_roster()["roster"])
-live_users = roster[roster[bot_version]==True]
+bot_version = "{bot_version}"
 key_suffix = "sandbox"
-sleep_time = int(60 / live_users.index.size)
 live = True
 fee = 0.005
 while live:
     comet.cloud_connect()
+    roster = pd.DataFrame(comet_roster.get_roster()["roster"])
+    live_users = roster[roster[bot_version]==True]
+    sleep_time = int(60 / live_users.index.size)
     for user in live_users["username"].unique():
         try:
-            trading_params = comet_roster.get_trade_parameters("test",user)["trade_params"]
+            trading_params = comet_roster.get_trade_parameters(bot_version,user)["trade_params"]
             positions =  int(trading_params["positions"])
             retrack_days = int(trading_params["retrack_days"])
             req = trading_params["req"]
@@ -57,7 +55,7 @@ while live:
                 except Exception as e:
                     error_message = {"date":datetime.now(),"status":status,"message":str(e),"currency":currency}
                     error_message["username"] = user
-                    comet.store("cloud_test_errors",pd.DataFrame([error_message]))
+                    comet.store(f"cloud_{bot_version}_errors",pd.DataFrame([error_message]))
                     continue
             current_spots = pd.DataFrame(spots)
             current_historicals = pd.concat(historicals)
@@ -76,7 +74,7 @@ while live:
                 except Exception as e:
                     error_message = {"date":datetime.now(),"status":status,"message":str(e),"currency":currency}
                     error_message["username"] = user
-                    comet.store("cloud_test_errors",pd.DataFrame([error_message]))
+                    comet.store(f"cloud_{bot_version}_errors",pd.DataFrame([error_message]))
                     continue
             final = pd.DataFrame(ns)
             merged = final.merge(current_spots.drop("volume",axis=1),on="crypto")
@@ -84,7 +82,7 @@ while live:
             merged["bid"] = [float(x) for x in merged["bid"]]
             merged["price"] = [float(x) for x in merged["price"]]
             merged["username"] = user
-            comet.store("cloud_test_historicals",merged)
+            comet.store(f"cloud_{bot_version}_historicals",merged)
             fls = []
             status = "fills"
             for currency in accounts["currency"].unique():
@@ -114,8 +112,8 @@ while live:
                         order_trades = new_buys[new_buys["order_id"]==oi]
                         if len([x for x in order_trades["settled"] if x == False]) == 0 and order_trades.index.size > 0:
                             order_trades["username"] = user
-                            comet.store("cloud_test_fills",order_trades)
-                            comet.store("cloud_test_completed_buys",order_trades)
+                            comet.store(f"cloud_{bot_version}_fills",order_trades)
+                            comet.store(f"cloud_{bot_version}_completed_buys",order_trades)
                     status = "trade_completes"
                     new_sells = new_fills[(new_fills["side"]=="sell")]
                     new_sells["size"] = [float(x) for x in new_sells["size"]]
@@ -124,14 +122,14 @@ while live:
                         sell_order_trades = new_sells[new_sells["order_id"]==soi]
                         if len([x for x in sell_order_trades["settled"] if x == False]) == 0:
                             sell_order_trades["username"] = user
-                            comet.store("cloud_test_fills",sell_order_trades)
-                            comet.store("cloud_test_completed_sells",sell_order_trades)
+                            comet.store(f"cloud_{bot_version}_fills",sell_order_trades)
+                            comet.store(f"cloud_{bot_version}_completed_sells",sell_order_trades)
             status = "sells"
-            completed_buys = comet.retrieve("cloud_test_completed_buys")
+            completed_buys = comet.retrieve(f"cloud_{bot_version}_completed_buys")
             if completed_buys.index.size > 0:
                 completed_buys["price"] = [float(x) for x in completed_buys["price"]]
                 completed_buys["size"] = [float(x) for x in completed_buys["size"]]
-                completed_trades = comet.retrieve("cloud_test_pending_trades")
+                completed_trades = comet.retrieve(f"cloud_{bot_version}_pending_trades")
                 if completed_trades.index.size > 0:
                     completed_trade_buy_ids = list(completed_trades["order_id"].unique())
                 else:
@@ -150,10 +148,10 @@ while live:
                                                                         ,trade["sell_price"]
                                                                         ,trade["size"])
                             sell_statement["username"] = user
-                            comet.store("cloud_test_pending_sells",pd.DataFrame([sell_statement]))
+                            comet.store(f"cloud_{bot_version}_pending_sells",pd.DataFrame([sell_statement]))
                             trade["sell_id"] = sell_statement["id"]
                             trade["username"] = user
-                            comet.store("cloud_test_pending_trades",pd.DataFrame([trade]))
+                            comet.store(f"cloud_{bot_version}_pending_trades",pd.DataFrame([trade]))
             status = "buys"
             data = cbs.get_orders()
             if balance > float(pv * (positions-fee)) and data.index.size < positions:
@@ -175,7 +173,7 @@ while live:
                         buy = cbs.place_buy(symbol,buy_price,size)
                         buy["username"] = user
                         if "message" not in buy.keys():
-                            comet.store("cloud_test_pending_buys",pd.DataFrame([buy]))
+                            comet.store(f"cloud_{bot_version}_pending_buys",pd.DataFrame([buy]))
                         else:
                             buy["date"] = datetime.now()
                             buy["crypto"] = symbol
@@ -183,7 +181,7 @@ while live:
                             buy["buy_price"] = buy_price
                             buy["balance"] = balance
                             buy["status"] = status
-                            comet.store("cloud_test_errors",pd.DataFrame([buy]))
+                            comet.store(f"cloud_{bot_version}_errors",pd.DataFrame([buy]))
             status = "recording completed_trades"
             comet.cloud_connect()
             pending_trades = comet.retrieve_pending_trades(user)
@@ -205,7 +203,7 @@ while live:
                 ct = complete_trades.groupby(["product_id","order_id"]).agg({"sell_price":"mean","size":"sum","fee":"sum","price":"mean","date":"first"}).reset_index()
                 if ct.index.size > 0:
                     ct["username"] = user
-                    comet.store("cloud_test_completed_trades",ct)
+                    comet.store(f"cloud_{bot_version}_completed_trades",ct)
             status = "iteration_log"
             iteration_data = {"date":datetime.now(),
                                 "retrack_days" : retrack_days
@@ -220,11 +218,11 @@ while live:
                                 ,"sleep_time" : sleep_time,
                                 "status":status,
                              "username":user}
-            comet.store("cloud_test_iterations",pd.DataFrame([iteration_data]))
+            comet.store(f"cloud_{bot_version}_iterations",pd.DataFrame([iteration_data]))
             sleep(sleep_time)
         except Exception as e:
             error_log = {"date":datetime.now(),"status":status,"message":str(e)}
             error_log["username"]=user
-            comet.store("cloud_test_errors",pd.DataFrame([error_log]))
+            comet.store(f"cloud_{bot_version}_errors",pd.DataFrame([error_log]))
             sleep(sleep_time)
     comet.disconnect()
