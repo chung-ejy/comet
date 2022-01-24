@@ -22,9 +22,8 @@ while live:
         sleep_time = int(60 / live_users.index.size)
         for user in live_users["username"].unique():
             try:
-                trading_params = pd.DataFrame(comet_roster.get_trade_parameters(bot_version,user))
-                # trading_params = p.column_date_processing(trading_params).sort_values("date")
-                trading_params = trading_params["trade_params"].tail().to_dict()
+                trading_params = comet_roster.get_trade_parameters(bot_version,user)
+                trading_params = trading_params["trade_params"]
                 whitelist_symbols = trading_params["whitelist_symbols"]
                 positions =  int(trading_params["positions"])
                 retrack_days = int(trading_params["retrack_days"])
@@ -227,6 +226,7 @@ while live:
             except Exception as e:
                 error_log = {"date":datetime.now(),"status":status,"message":str(e)}
                 error_log["username"]=user
+                print(error_log)
                 comet.store(f"cloud_{bot_version}_errors",pd.DataFrame([error_log]))
                 sleep(sleep_time)
         comet.disconnect()
