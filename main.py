@@ -20,13 +20,6 @@ while live:
     sleep_time = int(60 / live_users.index.size)
     for user in live_users["username"].unique():
         try:
-            whitelist_symbols = [ 
-                    'BTC',
-                    'ADA',
-                    'ETH',
-                    'MATIC',
-                    'DOT'
-                    ]
             trading_params = comet_roster.get_trade_parameters(bot_version,user)["trade_params"]
             whitelist_symbols = trading_params["whitelist_symbols"]
             positions =  int(trading_params["positions"])
