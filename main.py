@@ -8,8 +8,8 @@ from comet_historian.comet_historian import CometHistorian as comet_hist
 from comet_roster.comet_roster import CometRoster as comet_roster
 import pytz
 status = "initial_load"
-bot_version = "test"
-key_suffix = "sandbox"
+bot_version = "live"
+key_suffix = ""
 live = True
 fee = 0.005
 comet = Comet(bot_version)
@@ -21,9 +21,14 @@ while live:
     for user in live_users["username"].unique():
         try:
             whitelist_symbols = [ 
-                    'BTC'
+                    'BTC',
+                    'ADA',
+                    'ETH',
+                    'MATIC',
+                    'DOT'
                     ]
             trading_params = comet_roster.get_trade_parameters(bot_version,user)["trade_params"]
+            whitelist_symbols = trading_params["whitelist_symbols"]
             positions =  int(trading_params["positions"])
             retrack_days = int(trading_params["retrack_days"])
             req = trading_params["req"]
