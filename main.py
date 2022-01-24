@@ -8,8 +8,8 @@ from comet_historian.comet_historian import CometHistorian as comet_hist
 from comet_roster.comet_roster import CometRoster as comet_roster
 import pytz
 status = "initial_load"
-bot_version = "live"
-key_suffix = ""
+bot_version = "test"
+key_suffix = "sandbox"
 live = True
 fee = 0.005
 comet = Comet(bot_version)
@@ -135,7 +135,7 @@ while live:
                 incomplete_trades = completed_buys[~completed_buys["order_id"].isin(completed_trade_buy_ids)]
                 if incomplete_trades.index.size > 0:
                     incomplete_trades = p.live_column_date_processing(incomplete_trades.rename(columns={"created_at":"date"}))
-                    incomplete_trades= incomplete_trades[incomplete_trades["trade_id"]>37559900]
+                    incomplete_trades= incomplete_trades[incomplete_trades["trade_id"]> 54502987]
                     for oi in incomplete_trades["order_id"].unique():
                         order = incomplete_trades[incomplete_trades["order_id"]==oi] \
                                         .groupby(["order_id","product_id"]) \
