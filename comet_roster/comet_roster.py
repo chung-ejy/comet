@@ -13,7 +13,7 @@ class CometRoster(object):
             "Content-type":"application/json",
             "x-api-key":key
         }
-        response = r.get(base_url,headers=headers)
+        response = r.get(base_url,headers=headers,params={"data_request":"all"})
         return response.json()
 
     @classmethod
