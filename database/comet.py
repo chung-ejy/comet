@@ -50,3 +50,28 @@ class Comet(ADatabase):
             return pd.DataFrame(list(data))
         except Exception as e:
             print(self.name,"fills",str(e))
+    
+    def update_username(self,user):
+        try:
+            db = self.client[self.name]
+            tables = db.list_collection_names()
+            for table in tables:
+                table_connect = db[table]
+                table_connect.update_many({},{ "$set": { "username": user }})
+        except Exception as e:
+            print(str(e))
+    
+    def update_collection_name(self,prefix):
+        try:
+            db = self.client[self.name]
+            tables = db.list_collection_names()
+            for table in tables:
+                if "test" not in table and "key" not in table:
+                    table_connect = db[table]
+                    first = table.split("_")[0]
+                    rest = "_".join(table.split("_")[1:])
+                    new_name = first + "_" + prefix + "_" + rest
+                    print(new_name)
+                    table_connect.rename(new_name)
+        except Exception as e:
+            print(str(e))

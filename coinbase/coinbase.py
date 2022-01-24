@@ -13,6 +13,7 @@ class Coinbase(object):
             self.base_url = "https://api-public.sandbox.exchange.coinbase.com"
         else:
             self.base_url = "https://api.exchange.coinbase.com"
+            
     def get_current_price(self,crypto):
         auth = CoinbaseWalletAuth(self.api_key,self.api_secret,self.api_passphrase)
         product_id = f'{crypto}-USD'
