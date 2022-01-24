@@ -25,7 +25,7 @@ whitelist_symbols = [
                     # , 'DOT'
                     # ,'MATIC'
                     ]
-live = True
+live = False
 while live:
     status = "initial_load"
     comet.cloud_connect()
