@@ -9,7 +9,7 @@ from comet_roster.comet_roster import CometRoster as comet_roster
 import pytz
 comet = Comet()
 status = "initial_load"
-bot_version = "{bot_version}"
+bot_version = "live"
 key_suffix = "sandbox"
 live = False
 fee = 0.005
