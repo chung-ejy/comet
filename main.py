@@ -140,7 +140,8 @@ while live:
                         order = incomplete_trades[incomplete_trades["order_id"]==oi] \
                                         .groupby(["order_id","product_id"]) \
                                         .agg({"date":"first","price":"mean","size":"sum"}).reset_index().iloc[0]
-                        trade = comet_hist.exit_analysis(exit_strategy,order,merged,req)
+                        ticker_merged = merged[merged["crypto"]==order["product_id"].split("-")[0]]
+                        trade = comet_hist.exit_analysis(exit_strategy,order,ticker_merged,req)
                         if "sell_price" in trade:
                             sell_statement = cbs.place_sell(trade["product_id"]
                                                                         ,trade["sell_price"]
