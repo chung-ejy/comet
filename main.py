@@ -7,12 +7,12 @@ from processor.processor import Processor as p
 from comet_historian.comet_historian import CometHistorian as comet_hist
 from comet_roster.comet_roster import CometRoster as comet_roster
 import pytz
-comet = Comet()
 status = "initial_load"
-bot_version = "live"
+bot_version = "test"
 key_suffix = "sandbox"
-live = False
+live = True
 fee = 0.005
+comet = Comet(bot_version)
 while live:
     comet.cloud_connect()
     roster = pd.DataFrame(comet_roster.get_roster()["roster"])
