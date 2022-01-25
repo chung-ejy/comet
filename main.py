@@ -19,7 +19,7 @@ while live:
         roster = pd.DataFrame(comet_roster.get_roster()["roster"])
         live_users = roster[roster[bot_version]==True]
         key_suffix = key_suffixs[bot_version]
-        sleep_time = int(60 / live_users.index.size)
+        sleep_time = int(6000 / live_users.index.size)
         for user in live_users["username"].unique():
             try:
                 trading_params = comet_roster.get_trade_parameters(bot_version,user)
