@@ -27,13 +27,12 @@ while live:
                 whitelist_symbols = trading_params["whitelist_symbols"]
                 positions =  int(trading_params["positions"])
                 retrack_days = int(trading_params["retrack_days"])
-                req = trading_params["req"]
-                signal = trading_params["signal"]
+                req = float(trading_params["req"])
+                signal = float(trading_params["signal"])
                 value = trading_params["value"]
                 conservative = trading_params["conservative"]
                 entry_strategy = trading_params["entry_strategy"]
                 exit_strategy = trading_params["exit_strategy"]
-                positions = trading_params["positions"]
                 minimum_rows = int(retrack_days * 3)
                 end = datetime.now().astimezone(pytz.UTC)
                 start = (end - timedelta(days=30)).astimezone(pytz.UTC)
