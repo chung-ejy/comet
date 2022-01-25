@@ -41,7 +41,6 @@ while live:
                 cbs = Coinbase(bot_version,secrets[f"{key_suffix}apikey"],secrets[f"{key_suffix}secret"],secrets[f"{key_suffix}passphrase"])
                 accounts = cbs.get_accounts()
                 balance = accounts[accounts["currency"]=="USD"]["balance"].iloc[0]
-                pv = sum(accounts["balance"])
                 spots = []
                 historicals = []
                 status = "spots"
@@ -59,6 +58,12 @@ while live:
                         comet.store(f"cloud_{bot_version}_errors",pd.DataFrame([error_message]))
                         continue
                 current_spots = pd.DataFrame(spots)
+                accounts = accounts.rename(columns={"currency":"crypto"}).merge(current_spots[["crypto","price"]],on="crypto",how="left")
+                accounts["available"]  = accounts["available"].astype(float)
+                accounts["price"]  = accounts["price"].astype(float)
+                accounts["pv"] = accounts["available"] * accounts["price"]
+                accounts.rename(columns={"crypto":"currency"},inplace=True)
+                pv = sum(accounts["pv"])
                 current_historicals = pd.concat(historicals)
                 current_historicals.sort_values("date",inplace=True)
                 ns = []
@@ -157,7 +162,7 @@ while live:
                                 comet.store(f"cloud_{bot_version}_pending_trades",pd.DataFrame([trade]))
                 status = "buys"
                 data = cbs.get_orders()
-                if balance > float(pv * (positions-fee)) and data.index.size < positions:
+                if balance > float(pv * (positions-fee)) and data.index.size < positions and data.index.size > 0:
                     offerings = comet_hist.entry_analysis(entry_strategy,merged,signal,value,conservative)
                     offerings = pd.DataFrame(offerings)
                     if offerings.index.size > 0:
