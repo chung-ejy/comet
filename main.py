@@ -220,6 +220,7 @@ while live:
                                     ,"conservative" : conservative
                                     ,"entry_strategy" : entry_strategy
                                     ,"exit_strategy" : exit_strategy
+                                    ,"positions":positions
                                     ,"fee" : fee
                                     ,"minimum_rows" : minimum_rows
                                     ,"sleep_time" : sleep_time,
