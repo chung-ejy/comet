@@ -150,7 +150,7 @@ while live:
                                             .agg({"date":"first","price":"mean","size":"sum"}).reset_index().iloc[0]
                             ticker_merged = merged[merged["crypto"]==order["product_id"].split("-")[0]]
                             order["date"] = str(order["date"])
-                            trade = comet_hist.exit_analysis(exit_strategy,order.to_dict(),ticker_merged,req)
+                            trade = comet_hist.exit_analysis(exit_strategy,order.to_dict(),ticker_merged,req)["rec"]
                             if "sell_price" in trade:
                                 sell_statement = cbs.place_sell(trade["product_id"]
                                                                             ,trade["sell_price"]
@@ -163,7 +163,7 @@ while live:
                 status = "buys"
                 data = cbs.get_orders()
                 if balance > float(pv * (positions-fee)) and data.index.size < positions and data.index.size > 0:
-                    offerings = comet_hist.entry_analysis(entry_strategy,merged,signal,value,conservative)
+                    offerings = comet_hist.entry_analysis(entry_strategy,merged,signal,value,conservative)["rec"]
                     offerings = pd.DataFrame(offerings)
                     if offerings.index.size > 0:
                         for pos_num in range(min(offerings.index.size,positions)):
