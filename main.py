@@ -12,6 +12,7 @@ live = True
 fee = 0.005
 key_suffixs = {"live":"","test":"sandbox"}
 minimum_trade_ids = {"live":54502987,"test":37559900}
+time_to_run = 300
 while live:
     for bot_version in ["live","test"]:
         comet = Comet(bot_version)
@@ -19,7 +20,7 @@ while live:
         roster = pd.DataFrame(comet_roster.get_roster()["roster"])
         live_users = roster[roster[bot_version]==True]
         key_suffix = key_suffixs[bot_version]
-        sleep_time = int(6000 / live_users.index.size)
+        sleep_time = int(time_to_run / live_users.index.size)
         for user in live_users["username"].unique():
             try:
                 trading_params = comet_roster.get_trade_parameters(bot_version,user)
@@ -107,7 +108,7 @@ while live:
                         existing_order_ids = list(existing_fills["order_id"])
                     else:
                         existing_order_ids = []
-                    new_fills = fills[~fills["order_id"].isin(existing_order_ids)]
+                    new_fills = fills[~fills["order_id"].isin(existing_order_ids) & fills["trade_id"] >  minimum_trade_ids[bot_version]]
                     status = "fills"
                     if new_fills.index.size > 0:
                         new_buys = new_fills[new_fills["side"]=="buy"]

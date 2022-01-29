@@ -8,7 +8,7 @@ class CometRoster(object):
     
     @classmethod
     def get_roster(self):
-        base_url = "https://cometroster.herokuapp.com/api/roster/"
+        base_url = "https://cometchaserapi.herokuapp.com/api/roster/"
         headers = {
             "Content-type":"application/json",
             "x-api-key":key
@@ -18,7 +18,7 @@ class CometRoster(object):
 
     @classmethod
     def get_trade_parameters(self,version,username):
-        base_url = "https://cometroster.herokuapp.com/api/trade_params/"
+        base_url = "https://cometchaserapi.herokuapp.com/api/trade_params/"
         headers = {
             "Content-type":"application/json",
             "x-api-key":key
@@ -29,7 +29,7 @@ class CometRoster(object):
 
     @classmethod
     def get_secrets(self,username):
-        base_url = "https://cometroster.herokuapp.com/api/treasure/"
+        base_url = "https://cometchaserapi.herokuapp.com/api/treasure/"
         headers = {
             "Content-type":"application/json",
             "x-api-key":key
