@@ -24,7 +24,7 @@ while live:
         for user in live_users["username"].unique():
             try:
                 trading_params = comet_roster.get_trade_parameters(bot_version,user)
-                trading_params = trading_params["trade_params"]
+                trading_params = trading_params
                 whitelist_symbols = trading_params["whitelist_symbols"]
                 positions =  int(trading_params["positions"])
                 retrack_days = int(trading_params["retrack_days"])
