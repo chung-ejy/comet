@@ -23,7 +23,7 @@ class CometRoster(object):
             "Content-type":"application/json",
             "x-api-key":key
         }
-        params = {"username":username,"version":version}
+        params = {"username":username,"version":version,"data_request":"user"}
         response = r.get(base_url,headers=headers,params=params)
         return response.json()
 
