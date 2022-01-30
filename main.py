@@ -108,7 +108,8 @@ while live:
                         existing_order_ids = list(existing_fills["order_id"])
                     else:
                         existing_order_ids = []
-                    new_fills = fills[~fills["order_id"].isin(existing_order_ids) & fills["trade_id"] >  minimum_trade_ids[bot_version]]
+                    print(existing_fills.index.size)
+                    new_fills = fills[(~fills["order_id"].isin(existing_order_ids)) & (fills["trade_id"] >  existing_fills["trade_id"].max())]
                     status = "fills"
                     if new_fills.index.size > 0:
                         new_buys = new_fills[new_fills["side"]=="buy"]
@@ -143,7 +144,6 @@ while live:
                     incomplete_trades = completed_buys[~completed_buys["order_id"].isin(completed_trade_buy_ids)]
                     if incomplete_trades.index.size > 0:
                         incomplete_trades = p.live_column_date_processing(incomplete_trades.rename(columns={"created_at":"date"}))
-                        incomplete_trades= incomplete_trades[incomplete_trades["trade_id"]> minimum_trade_ids[bot_version]]
                         for oi in incomplete_trades["order_id"].unique():
                             order = incomplete_trades[incomplete_trades["order_id"]==oi] \
                                             .groupby(["order_id","product_id"]) \
