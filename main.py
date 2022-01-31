@@ -110,33 +110,46 @@ while live:
                 if len(fls) > 0:
                     fills = pd.concat(fls)
                     #store_non_existing_executed_buy
-                    existing_fills = comet.retrieve_fills(user)
-                    if existing_fills.index.size > 1:
-                        existing_order_ids = list(existing_fills["order_id"])
-                        max_trade_id = existing_fills["trade_id"].max()
+                    bot_existing_fills = comet.retrieve_fills(user)
+                    bot_pending_buys = comet.retrieve_pending_buys(user)
+                    bot_pending_sells = comet.retrieve_pending_sells(user)
+                    if bot_existing_fills.index.size > 1:
+                        existing_order_ids = list(bot_existing_fills["order_id"])
+                        existing_order_ids = list(bot_existing_fills["order_id"])
+                        max_trade_id = bot_existing_fills["trade_id"].max()
                     else:
                         existing_order_ids = []
                         max_trade_id = 0
+                    if bot_pending_buys.index.size > 0:
+                        buy_ids = list(bot_pending_buys["order_id"])
+                    else:
+                        buy_ids = []
+                    if bot_pending_sells.index.size > 0:
+                        buy_ids = list(bot_pending_sells["order_id"])
+                    else:
+                        sell_ids = []
                     new_fills = fills[(~fills["order_id"].isin(existing_order_ids)) & (fills["trade_id"] >  max_trade_id)]
                     status = "fills"
                     if new_fills.index.size > 0:
-                        new_buys = new_fills[new_fills["side"]=="buy"]
+                        new_buys = new_fills[(new_fills["side"]=="buy") & (new_fills["order_id"].isin(buy_ids))]
                         new_buys["size"] = [float(x) for x in new_buys["size"]]
                         new_buys["price"] = [float(x) for x in new_buys["price"]]
                         for oi in new_buys["order_id"].unique():
                             order_trades = new_buys[new_buys["order_id"]==oi]
                             if len([x for x in order_trades["settled"] if x == False]) == 0 and order_trades.index.size > 0:
                                 order_trades["username"] = user
+                                order_trades["executor"] = "bot"
                                 comet.store(f"cloud_{bot_version}_fills",order_trades)
                                 comet.store(f"cloud_{bot_version}_completed_buys",order_trades)
                         status = "trade_completes"
-                        new_sells = new_fills[(new_fills["side"]=="sell")]
+                        new_sells = new_fills[(new_fills["side"]=="sell") & (new_fills["order_id"].isin(sell_ids))]
                         new_sells["size"] = [float(x) for x in new_sells["size"]]
                         new_sells["price"] = [float(x) for x in new_sells["price"]]
                         for soi in new_sells["order_id"].unique():
                             sell_order_trades = new_sells[new_sells["order_id"]==soi]
                             if len([x for x in sell_order_trades["settled"] if x == False]) == 0:
                                 sell_order_trades["username"] = user
+                                sell_order_trades["executor"] = "bot"
                                 comet.store(f"cloud_{bot_version}_fills",sell_order_trades)
                                 comet.store(f"cloud_{bot_version}_completed_sells",sell_order_trades)
                 status = "sells"
@@ -164,9 +177,11 @@ while live:
                                                                             ,trade["sell_price"]
                                                                             ,trade["size"])
                                 sell_statement["username"] = user
+                                sell_statement["executor"] = "bot"
                                 comet.store(f"cloud_{bot_version}_pending_sells",pd.DataFrame([sell_statement]))
                                 trade["sell_id"] = sell_statement["id"]
                                 trade["username"] = user
+                                trade["executor"] = "bot"
                                 comet.store(f"cloud_{bot_version}_pending_trades",pd.DataFrame([trade]))
                 status = "buys"
                 data = cbs.get_orders()
@@ -189,6 +204,7 @@ while live:
                             buy = cbs.place_buy(symbol,buy_price,size)
                             buy["username"] = user
                             if "message" not in buy.keys():
+                                buy["executor"] = "bot"
                                 comet.store(f"cloud_{bot_version}_pending_buys",pd.DataFrame([buy]))
                             else:
                                 buy["date"] = datetime.now()
@@ -219,6 +235,7 @@ while live:
                     ct = complete_trades.groupby(["product_id","order_id"]).agg({"sell_price":"mean","size":"sum","fee":"sum","price":"mean","date":"first"}).reset_index()
                     if ct.index.size > 0:
                         ct["username"] = user
+                        ct["executor"] = "bot"
                         comet.store(f"cloud_{bot_version}_completed_trades",ct)
                 status = "iteration_log"
                 iteration_data = {"date":datetime.now(),
