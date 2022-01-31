@@ -185,7 +185,8 @@ while live:
                                 comet.store(f"cloud_{bot_version}_pending_trades",pd.DataFrame([trade]))
                 status = "buys"
                 data = cbs.get_orders()
-                if balance > float(pv * (1-fee) /positions):
+                position_size = float(pv * (1-fee) /positions)
+                if balance > position_size:
                     offerings = comet_hist.entry_analysis(entry_strategy,merged,signal,value,conservative,req)["rec"]
                     offerings = pd.DataFrame(offerings)
                     if offerings.index.size > 0:
@@ -195,12 +196,12 @@ while live:
                             symbol = trade["crypto"]
                             round_value = 2
                             for i in range(2,9):
-                                if float(balance / buy_price) > 10 **-i:
+                                if float(position_size / buy_price) > 10 **-i:
                                     round_value = i + 1
                                     break
                                 else:
                                     continue
-                            size = round(float(balance/(buy_price*(1+fee))),round_value)
+                            size = round(float(position_size/(buy_price*(1+fee))),round_value)
                             buy = cbs.place_buy(symbol,buy_price,size)
                             buy["username"] = user
                             if "message" not in buy.keys():
