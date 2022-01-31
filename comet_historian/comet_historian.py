@@ -16,7 +16,7 @@ class CometHistorian(object):
         stuff = {"entry_strategy":entry_strategy,"data":merged.to_dict("records")
         ,"signal":signal,"value":value,"conservative":conservative,
         "key":str(key),"side":"entry","req":req}
-        response = r.post(base_url,headers=headers,params=json.dumps(stuff).encode("utf-8"))
+        response = r.post(base_url,headers=headers,data=json.dumps(stuff).encode("utf-8"))
         return response.json()
 
     @classmethod
@@ -27,5 +27,5 @@ class CometHistorian(object):
             "X-Api-Key":key
         }
         stuff = {"exit_strategy":exit_strategy,"order":order,"data":merged.to_dict("records"),"req":req,"key":key,"side":"exit"}
-        response = r.post(base_url,headers=headers,params=json.dumps(stuff).encode("utf-8"))
+        response = r.post(base_url,headers=headers,data=json.dumps(stuff).encode("utf-8"))
         return response.json()

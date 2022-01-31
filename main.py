@@ -185,7 +185,7 @@ while live:
                                 comet.store(f"cloud_{bot_version}_pending_trades",pd.DataFrame([trade]))
                 status = "buys"
                 data = cbs.get_orders()
-                if balance > float(pv * (1-fee) /positions) and data.index.size < positions and data.index.size > 0:
+                if balance > float(pv * (1-fee) /positions):
                     offerings = comet_hist.entry_analysis(entry_strategy,merged,signal,value,conservative)["rec"]
                     offerings = pd.DataFrame(offerings)
                     if offerings.index.size > 0:
