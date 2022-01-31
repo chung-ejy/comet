@@ -22,7 +22,7 @@ class CometHistorian(object):
 
     @classmethod
     def exit_analysis(self,exit_strategy,order,merged,req):
-        base_url = "https://cometcometchaser.herokuapp.com/api/analysis/"
+        base_url = "https://cometchaserapi.herokuapp.com/api/analysis/"
         headers = {
             "Content-type":"application/json",
             "X-Api-Key":key
