@@ -9,8 +9,8 @@ class Comet(ADatabase):
     def retrieve_fills(self,user):
         try:
             db = self.client[self.name]
-            table = db["cloud_{self.version}_fills"]
-            data = table.find({"username":user},{"order_id":1,"trade_id":1,"_id":0},show_record_id=False)
+            table = db[f"cloud_{self.version}_fills"]
+            data = table.find({"username":user},show_record_id=False)
             return pd.DataFrame(list(data))
         except Exception as e:
             print(self.name,"fills",str(e))
@@ -18,8 +18,8 @@ class Comet(ADatabase):
     def retrieve_pending_buys(self,user):
         try:
             db = self.client[self.name]
-            table = db["cloud_{self.version}_pending_buys"]
-            data = table.find({"username":user,"executor":"bot"},{"id":1,"trade_id":1,"_id":0},show_record_id=False)
+            table = db[f"cloud_{self.version}_pending_buys"]
+            data = table.find({"username":user,"executor":"bot"},show_record_id=False)
             return pd.DataFrame(list(data))
         except Exception as e:
             print(self.name,"fills",str(e))
@@ -27,8 +27,8 @@ class Comet(ADatabase):
     def retrieve_pending_sells(self,user):
         try:
             db = self.client[self.name]
-            table = db["cloud_{self.version}_pending_sells"]
-            data = table.find({"username":user,"executor":"bot"},{"id":1,"trade_id":1,"_id":0},show_record_id=False)
+            table = db[f"cloud_{self.version}_pending_sells"]
+            data = table.find({"username":user,"executor":"bot"},show_record_id=False)
             return pd.DataFrame(list(data))
         except Exception as e:
             print(self.name,"fills",str(e))
@@ -36,8 +36,8 @@ class Comet(ADatabase):
     def retrieve_completed_buys(self,user):
         try:
             db = self.client[self.name]
-            table = db["cloud_{self.version}_completed_buys"]
-            data = table.find({"username":user,"executor":"bot"},{"order_id":1,"trade_id":1,"_id":0},show_record_id=False)
+            table = db[f"cloud_{self.version}_completed_buys"]
+            data = table.find({"username":user,"executor":"bot"},show_record_id=False)
             return pd.DataFrame(list(data))
         except Exception as e:
             print(self.name,"fills",str(e))
@@ -45,8 +45,8 @@ class Comet(ADatabase):
     def retrieve_pending_trades(self,user):
         try:
             db = self.client[self.name]
-            table = db["cloud_{self.version}_pending_trades"]
-            data = table.find({"username":user,"executor":"bot"},{"order_id":1,"trade_id":1,"_id":0},show_record_id=False)
+            table = db[f"cloud_{self.version}_pending_trades"]
+            data = table.find({"username":user,"executor":"bot"},show_record_id=False)
             return pd.DataFrame(list(data))
         except Exception as e:
             print(self.name,"fills",str(e))
@@ -54,8 +54,8 @@ class Comet(ADatabase):
     def retrieve_completed_trades(self,user):
         try:
             db = self.client[self.name]
-            table = db["cloud_{self.version}_completed_trades"]
-            data = table.find({"username":user,"executor":"bot"},{"order_id":1,"trade_id":1,"_id":0},show_record_id=False)
+            table = db[f"cloud_{self.version}_completed_trades"]
+            data = table.find({"username":user,"executor":"bot"},show_record_id=False)
             return pd.DataFrame(list(data))
         except Exception as e:
             print(self.name,"fills",str(e))
@@ -63,8 +63,8 @@ class Comet(ADatabase):
     def retrieve_completed_sells(self,user):
         try:
             db = self.client[self.name]
-            table = db["cloud_{self.version}_completed_sells"]
-            data = table.find({"username":user,"executor":"bot"},{"order_id":1,"trade_id":1,"_id":0},show_record_id=False)
+            table = db[f"cloud_{self.version}_completed_sells"]
+            data = table.find({"username":user,"executor":"bot"},show_record_id=False)
             return pd.DataFrame(list(data))
         except Exception as e:
             print(self.name,"fills",str(e))

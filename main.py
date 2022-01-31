@@ -115,7 +115,6 @@ while live:
                     bot_pending_sells = comet.retrieve_pending_sells(user)
                     if bot_existing_fills.index.size > 1:
                         existing_order_ids = list(bot_existing_fills["order_id"])
-                        existing_order_ids = list(bot_existing_fills["order_id"])
                         max_trade_id = bot_existing_fills["trade_id"].max()
                     else:
                         existing_order_ids = []
