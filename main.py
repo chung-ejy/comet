@@ -211,7 +211,7 @@ while live:
                                 buy["crypto"] = symbol
                                 buy["size"] = size
                                 buy["buy_price"] = buy_price
-                                buy["balance"] = balance
+                                buy["position_size"] = position_size
                                 buy["status"] = status
                                 comet.store(f"cloud_{bot_version}_errors",pd.DataFrame([buy]))
                 status = "recording completed_trades"
