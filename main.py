@@ -21,7 +21,6 @@ while live:
         comet = Comet(bot_version)
         comet.cloud_connect()
         roster = pd.DataFrame(comet_roster.get_roster())
-        # subscriptions = pd.DataFrame(comet_roster.get_subscriptions())
         live_users = roster[roster[bot_version]==True]
         key_suffix = key_suffixs[bot_version]
         sleep_time = int(time_to_run / live_users.index.size)
@@ -253,11 +252,9 @@ while live:
                                     "status":status,
                                 "username":user}
                 comet.store(f"cloud_{bot_version}_iterations",pd.DataFrame([iteration_data]))
-                sleep(sleep_time)
             except Exception as e:
                 error_log = {"date":datetime.now(),"status":status,"message":str(e)}
                 error_log["username"]=user
                 print(error_log)
                 comet.store(f"cloud_{bot_version}_errors",pd.DataFrame([error_log]))
-                sleep(sleep_time)
         comet.disconnect()
