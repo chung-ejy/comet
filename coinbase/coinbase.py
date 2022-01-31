@@ -139,7 +139,7 @@ class Coinbase(object):
             "cancel_after": "day",
             "post_only": "false",
             "price":round(buy_price,2),
-            "size":round(size,6)
+            "size":size
         }
         response = requests.post(url,auth=auth,json=payload)
         return response.json()
@@ -164,7 +164,7 @@ class Coinbase(object):
             "time_in_force": "GTC",
             "post_only": "false",
             "price":round(sell_price,2),
-            "size":round(size,6)
+            "size":size
         }
         response = requests.post(url,auth=auth,json=payload)
         return response.json()
