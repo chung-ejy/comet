@@ -70,7 +70,7 @@ while live:
                 accounts["price"]  = accounts["price"].astype(float)
                 accounts["pv"] = accounts["available"] * accounts["price"]
                 accounts.rename(columns={"crypto":"currency"},inplace=True)
-                pv = np.nansum(accounts["pv"])
+                pv = np.nansum(accounts["pv"]) + balance
                 current_historicals = pd.concat(historicals)
                 current_historicals.sort_values("date",inplace=True)
                 ns = []
@@ -210,6 +210,7 @@ while live:
                                 buy["date"] = datetime.now()
                                 buy["crypto"] = symbol
                                 buy["size"] = size
+                                buy["round_value"] = round_value
                                 buy["buy_price"] = buy_price
                                 buy["position_size"] = position_size
                                 buy["status"] = status
