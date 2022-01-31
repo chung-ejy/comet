@@ -190,13 +190,10 @@ while live:
                                     comet.store(f"cloud_{bot_version}_pending_trades",pd.DataFrame([trade]))
                                 else:
                                     sell_statement["date"] = datetime.now()
-                                    sell_statement["crypto"] = symbol
-                                    sell_statement["size"] = size
-                                    sell_statement["round_value"] = round_value
+                                    sell_statement["size"] = trade["size"]
                                     sell_statement["sell_price"] = trade["sell_price"]
-                                    sell_statement["position_size"] = position_size
                                     sell_statement["status"] = status
-                                    comet.store(f"cloud_{bot_version}_errors",pd.DataFrame([buy]))
+                                    comet.store(f"cloud_{bot_version}_errors",pd.DataFrame([sell_statement]))
                 status = "buys"
                 data = cbs.get_orders()
                 position_size = float(pv * (1-fee) / positions)
