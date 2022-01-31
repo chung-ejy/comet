@@ -102,7 +102,7 @@ while live:
                 merged["username"] = user
                 comet.store(f"cloud_{bot_version}_historicals",merged)
                 fls = []
-                status = "fills"
+                status = "acquiring_fills"
                 for currency in accounts["currency"].unique():
                     fill = cbs.get_fill(currency)
                     if len(fill) > 0:
@@ -118,17 +118,17 @@ while live:
                     bot_existing_fills = comet.retrieve_fills(user)
                     bot_pending_buys = comet.retrieve_pending_buys(user)
                     bot_pending_sells = comet.retrieve_pending_sells(user)
-                    if bot_existing_fills.index.size > 0:
+                    if "order_id" in  bot_existing_fills.columns:
                         existing_order_ids = list(bot_existing_fills["order_id"])
                         max_trade_id = bot_existing_fills["trade_id"].max()
                     else:
                         existing_order_ids = []
                         max_trade_id = 0
-                    if bot_pending_buys.index.size > 0:
+                    if "id" in bot_pending_buys.columns:
                         buy_ids = list(bot_pending_buys["id"])
                     else:
                         buy_ids = []
-                    if bot_pending_sells.index.size > 0:
+                    if "id" in bot_pending_sells.columns:
                         sell_ids = list(bot_pending_sells["id"])
                     else:
                         sell_ids = []
@@ -221,7 +221,6 @@ while live:
                                 buy["status"] = status
                                 comet.store(f"cloud_{bot_version}_errors",pd.DataFrame([buy]))
                 status = "recording completed_trades"
-                comet.cloud_connect()
                 pending_trades = comet.retrieve_pending_trades(user)
                 complete_trades = comet.retrieve_completed_trades(user)
                 complete_sells = comet.retrieve_completed_sells(user)
