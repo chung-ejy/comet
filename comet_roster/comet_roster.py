@@ -17,6 +17,16 @@ class CometRoster(object):
         return response.json()
 
     @classmethod
+    def get_subscriptions(self):
+        base_url = "https://cometchaserapi.herokuapp.com/api/roster/"
+        headers = {
+            "Content-type":"application/json",
+            "x-api-key":key
+        }
+        response = r.get(base_url,headers=headers,params={"data_request":"subscriptions"})
+        return response.json()
+
+    @classmethod
     def get_trade_parameters(self,version,username):
         base_url = "https://cometchaserapi.herokuapp.com/api/trade_params/"
         headers = {
