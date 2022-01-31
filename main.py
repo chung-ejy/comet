@@ -1,6 +1,7 @@
 import pandas as pd
 from datetime import datetime, timedelta
 from time import sleep
+from comet import comet_historian
 from database.comet import Comet
 from coinbase.coinbase import Coinbase
 from processor.processor import Processor as p
@@ -30,6 +31,11 @@ while live:
                 trading_params = comet_roster.get_trade_parameters(bot_version,user)
                 trading_params = trading_params
                 whitelist_symbols = trading_params["whitelist_symbols"]
+                if "ALL" in whitelist_symbols:
+                    try:
+                        whitelist_symbols = comet_hist.get_symbols()
+                    except Exception as e:
+                        print(str(E))
                 positions =  int(trading_params["positions"])
                 retrack_days = int(trading_params["retrack_days"])
                 req = float(trading_params["req"])

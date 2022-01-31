@@ -29,3 +29,13 @@ class CometHistorian(object):
         stuff = {"exit_strategy":exit_strategy,"order":order,"data":merged.to_dict("records"),"req":req,"key":key,"side":"exit"}
         response = r.post(base_url,headers=headers,data=json.dumps(stuff).encode("utf-8"))
         return response.json()
+    
+    @classmethod
+    def get_symbols(self):
+        base_url = "https://cometchaserapi.herokuapp.com/api/backtest/"
+        headers = {
+            "Content-type":"application/json",
+            "X-Api-Key":key
+        }
+        response = r.get(base_url,headers=headers)
+        return response.json()
