@@ -205,7 +205,7 @@ while live:
                                     break
                                 else:
                                     continue
-                            size = round(float(position_size/(buy_price*(1+fee))),round_value)
+                            size = round(float(position_size/(buy_price*(1+fee))),round_value) - 10 **-round_value
                             buy = cbs.place_buy(symbol,buy_price,size)
                             buy["username"] = user
                             if "message" not in buy.keys():
