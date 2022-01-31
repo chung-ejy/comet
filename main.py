@@ -106,10 +106,11 @@ while live:
                     existing_fills = comet.retrieve_fills(user)
                     if existing_fills.index.size > 1:
                         existing_order_ids = list(existing_fills["order_id"])
+                        max_trade_id = existing_fills["trade_id"].max()
                     else:
                         existing_order_ids = []
-                    print(existing_fills.index.size)
-                    new_fills = fills[(~fills["order_id"].isin(existing_order_ids)) & (fills["trade_id"] >  existing_fills["trade_id"].max())]
+                        max_trade_id = 0
+                    new_fills = fills[(~fills["order_id"].isin(existing_order_ids)) & (fills["trade_id"] >  max_trade_id)]
                     status = "fills"
                     if new_fills.index.size > 0:
                         new_buys = new_fills[new_fills["side"]=="buy"]
