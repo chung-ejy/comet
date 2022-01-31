@@ -18,7 +18,7 @@ time_to_run = 300
 key = os.getenv("ENCRYPTIONKEY")
 fernet = Fernet(key.encode())
 while live:
-    for bot_version in ["live","test"]:
+    for bot_version in ["test","live"]:
         comet = Comet(bot_version)
         comet.cloud_connect()
         roster = pd.DataFrame(comet_roster.get_roster())
@@ -186,7 +186,7 @@ while live:
                 status = "buys"
                 data = cbs.get_orders()
                 if balance > float(pv * (1-fee) /positions):
-                    offerings = comet_hist.entry_analysis(entry_strategy,merged,signal,value,conservative)["rec"]
+                    offerings = comet_hist.entry_analysis(entry_strategy,merged,signal,value,conservative,req)["rec"]
                     offerings = pd.DataFrame(offerings)
                     if offerings.index.size > 0:
                         for pos_num in range(min(offerings.index.size,positions)):
