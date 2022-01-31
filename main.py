@@ -11,8 +11,7 @@ status = "initial_load"
 live = True
 fee = 0.005
 key_suffixs = {"live":"","test":"sandbox"}
-minimum_trade_ids = {"live":54502987,"test":37559900}
-time_to_run = 900
+time_to_run = 300
 while live:
     for bot_version in ["live","test"]:
         comet = Comet(bot_version)
