@@ -6,12 +6,16 @@ from coinbase.coinbase import Coinbase
 from processor.processor import Processor as p
 from comet_historian.comet_historian import CometHistorian as comet_hist
 from comet_roster.comet_roster import CometRoster as comet_roster
+from cryptography.fernet import Fernet
+import os
 import pytz
 status = "initial_load"
 live = True
 fee = 0.005
 key_suffixs = {"live":"","test":"sandbox"}
 time_to_run = 300
+key = os.getenv("HISTORIANKEY")
+fernet = Fernet(key)
 while live:
     for bot_version in ["live","test"]:
         comet = Comet(bot_version)
@@ -37,7 +41,10 @@ while live:
                 end = datetime.now().astimezone(pytz.UTC)
                 start = (end - timedelta(days=30)).astimezone(pytz.UTC)
                 secrets = comet_roster.get_secrets(user)
-                cbs = Coinbase(bot_version,secrets[f"{key_suffix}apikey"],secrets[f"{key_suffix}secret"],secrets[f"{key_suffix}passphrase"])
+                apiKey = fernet.decrypt(secrets[f"{key_suffix}apikey"]).decode()
+                secret = fernet.decrypt(secrets[f"{key_suffix}secret"]).decode()
+                passphrase = fernet.decrypt(secrets[f"{key_suffix}passphrase"]).decode()
+                cbs = Coinbase(bot_version,apiKey,secret,passphrase)
                 accounts = cbs.get_accounts()
                 balance = accounts[accounts["currency"]=="USD"]["balance"].iloc[0]
                 spots = []
