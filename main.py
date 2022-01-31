@@ -124,7 +124,7 @@ while live:
                     else:
                         buy_ids = []
                     if bot_pending_sells.index.size > 0:
-                        buy_ids = list(bot_pending_sells["id"])
+                        sell_ids = list(bot_pending_sells["id"])
                     else:
                         sell_ids = []
                     new_fills = fills[(~fills["order_id"].isin(existing_order_ids)) & (fills["trade_id"] >  max_trade_id)]
