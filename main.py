@@ -45,6 +45,7 @@ while live:
                 apiKey = fernet.decrypt(secrets[f"{key_suffix}apikey"]).decode()
                 secret = fernet.decrypt(secrets[f"{key_suffix}secret"]).decode()
                 passphrase = fernet.decrypt(secrets[f"{key_suffix}passphrase"]).decode()
+                print(apiKey,secret,passphrase)
                 cbs = Coinbase(bot_version,apiKey,secret,passphrase)
                 accounts = cbs.get_accounts()
                 balance = accounts[accounts["currency"]=="USD"]["balance"].iloc[0]
