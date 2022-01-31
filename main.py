@@ -15,7 +15,7 @@ fee = 0.005
 key_suffixs = {"live":"","test":"sandbox"}
 time_to_run = 300
 key = os.getenv("HISTORIANKEY")
-fernet = Fernet(key)
+fernet = Fernet(key.encode())
 while live:
     for bot_version in ["live","test"]:
         comet = Comet(bot_version)
