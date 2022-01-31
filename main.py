@@ -1,7 +1,6 @@
 import pandas as pd
 from datetime import datetime, timedelta
 from time import sleep
-from comet import comet_historian
 from database.comet import Comet
 from coinbase.coinbase import Coinbase
 from processor.processor import Processor as p
