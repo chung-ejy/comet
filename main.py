@@ -9,6 +9,7 @@ from comet_roster.comet_roster import CometRoster as comet_roster
 from cryptography.fernet import Fernet
 import os
 import pytz
+import numpy as np
 status = "initial_load"
 live = True
 fee = 0.005
@@ -69,7 +70,7 @@ while live:
                 accounts["price"]  = accounts["price"].astype(float)
                 accounts["pv"] = accounts["available"] * accounts["price"]
                 accounts.rename(columns={"crypto":"currency"},inplace=True)
-                pv = sum(accounts["pv"])
+                pv = np.nansum(accounts["pv"])
                 current_historicals = pd.concat(historicals)
                 current_historicals.sort_values("date",inplace=True)
                 ns = []
@@ -184,7 +185,7 @@ while live:
                                 comet.store(f"cloud_{bot_version}_pending_trades",pd.DataFrame([trade]))
                 status = "buys"
                 data = cbs.get_orders()
-                if balance > float(pv * (positions-fee)) and data.index.size < positions and data.index.size > 0:
+                if balance > float(pv * (1-fee) /positions) and data.index.size < positions and data.index.size > 0:
                     offerings = comet_hist.entry_analysis(entry_strategy,merged,signal,value,conservative)["rec"]
                     offerings = pd.DataFrame(offerings)
                     if offerings.index.size > 0:
