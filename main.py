@@ -10,7 +10,6 @@ from cryptography.fernet import Fernet
 import os
 import pytz
 import numpy as np
-status = "initial_load"
 live = True
 fee = 0.005
 key_suffixs = {"live":"","test":"sandbox"}
@@ -21,6 +20,7 @@ while live:
     for bot_version in ["test","live"]:
         comet = Comet(bot_version)
         comet.cloud_connect()
+        status = "initial_load"
         roster = pd.DataFrame(comet_roster.get_roster())
         live_users = roster[roster[bot_version]==True]
         key_suffix = key_suffixs[bot_version]
@@ -118,7 +118,7 @@ while live:
                     bot_existing_fills = comet.retrieve_fills(user)
                     bot_pending_buys = comet.retrieve_pending_buys(user)
                     bot_pending_sells = comet.retrieve_pending_sells(user)
-                    if bot_existing_fills.index.size > 1:
+                    if bot_existing_fills.index.size > 0:
                         existing_order_ids = list(bot_existing_fills["order_id"])
                         max_trade_id = bot_existing_fills["trade_id"].max()
                     else:
@@ -157,7 +157,7 @@ while live:
                                 comet.store(f"cloud_{bot_version}_fills",sell_order_trades)
                                 comet.store(f"cloud_{bot_version}_completed_sells",sell_order_trades)
                 status = "sells"
-                completed_buys = comet.retrieve(f"cloud_{bot_version}_completed_buys")
+                completed_buys = comet.retrieve_completed_buys(user)
                 if completed_buys.index.size > 0:
                     completed_buys["price"] = [float(x) for x in completed_buys["price"]]
                     completed_buys["size"] = [float(x) for x in completed_buys["size"]]
