@@ -18,15 +18,16 @@ key = os.getenv("ENCRYPTIONKEY")
 fernet = Fernet(key.encode())
 while live:
     for bot_version in ["test","live"]:
+        status = "bot_initial_loads"
         comet = Comet(bot_version)
         comet.cloud_connect()
-        status = "initial_load"
         roster = pd.DataFrame(comet_roster.get_roster())
         live_users = roster[roster[bot_version]==True]
         key_suffix = key_suffixs[bot_version]
         sleep_time = int(time_to_run / live_users.index.size)
         for user in live_users["username"].unique():
             try:
+                status = "initial_load"
                 trading_params = comet_roster.get_trade_parameters(bot_version,user)
                 trading_params = trading_params
                 whitelist_symbols = trading_params["whitelist_symbols"]
