@@ -35,7 +35,7 @@ while live:
                     try:
                         whitelist_symbols = comet_hist.get_symbols()
                     except Exception as e:
-                        print(str(E))
+                        print(str(e))
                 positions =  int(trading_params["positions"])
                 retrack_days = int(trading_params["retrack_days"])
                 req = float(trading_params["req"])
@@ -213,7 +213,7 @@ while live:
                                     break
                                 else:
                                     continue
-                            size = round(float(position_size/(buy_price*(1+fee))),round_value) - (10 ** - (round_value + 1))
+                            size = round(round(float(position_size/(buy_price*(1+fee))),round_value) - (10 ** - (round_value + 1)),round_value+1)
                             buy = cbs.place_buy(symbol,buy_price,size)
                             buy["username"] = user
                             if "message" not in buy.keys():
